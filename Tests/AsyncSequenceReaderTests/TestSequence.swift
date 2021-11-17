@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import XCTest
 
 struct TestSequence<Base>: AsyncSequence where Base: Sequence {
     typealias Element = Base.Element
@@ -42,4 +43,11 @@ struct ThrowingTestSequence<Base>: AsyncSequence where Base: Sequence {
     func makeAsyncIterator() -> AsyncIterator {
         AsyncIterator(baseIterator: base.makeIterator())
     }
+}
+
+func AsyncXCTAssertEqual<T>(_ expression1: @autoclosure () async throws -> T, _ expression2: @autoclosure () async throws -> T, _ message: @autoclosure () -> String = "", file: StaticString = #filePath, line: UInt = #line) async rethrows where T : Equatable {
+    let result1 = try await expression1()
+    let result2 = try await expression2()
+    
+    XCTAssertEqual(result1, result2, message(), file: file, line: line)
 }
