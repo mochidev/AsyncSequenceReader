@@ -12,7 +12,7 @@ extension AsyncIteratorProtocol {
     /// Asynchronously advances by the specified number of elements, or ends the sequence if there is no next element.
     ///
     /// If a complete array could not be collected, an error is thrown and the sequence should be considered finished.
-    /// - Parameter count: The number of bytes to collect.
+    /// - Parameter count: The number of elements to collect.
     /// - Returns: A collection with exactly `count` elements, or `nil` if the sequence is finished.
     /// - Throws: `AsyncSequenceReaderError.insufficientElements` if a complete byte sequence could not be returned by the time the sequence ended.
     public mutating func collect(_ count: Int) async throws -> [Element]? {
