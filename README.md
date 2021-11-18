@@ -122,7 +122,7 @@ var veryLargeSequence = try await iterator.collect(1024*1024*1024) { sequence ->
 }
 ```
 
-In the above example, our sequence transform gives us access to a sequence that will be at most `1024*1024*1024` bytes large, which is 1 GB! However, instead of accumulating that data into an array, we get a sequence back, which we can attach an iterator map to so we can process the data 1 MB at a time, combining that data into a `DataFrame` type. When, we can consume this transformed sequence, reducing it to calculate averages for each data frame, and storing those averages in a `Summary` object.
+In the above example, our sequence transform gives us access to a sequence that will be at most `1024*1024*1024` bytes large, which is 1 GB! However, instead of accumulating that data into an array, we get a sequence back, which we can attach an iterator map to so we can process the data 1 MB at a time, combining that data into a `DataFrame` type. Then, we can consume this transformed sequence, reducing it to calculate averages for each data frame, and storing those averages in a `Summary` object.
 
 Note that this whole time, no more than around 1 MB of memory will be used at a time, because it'll only actually be consumes while reducing the results, which will only read 1 MB of data at a time, and will stop once a total of 1 GB of data has been read.
 
