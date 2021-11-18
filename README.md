@@ -175,7 +175,7 @@ for await dataFrame in results {
 }
 ```
 
-Better yet, [Bytes](https://github.com/mochidev/Bytes) will soon be getting support for reading from `AsyncIteratorProtocol` directly, allowing you to simplify the above to:
+Better yet, [Bytes](https://github.com/mochidev/Bytes) also has support for reading from `AsyncIteratorProtocol` directly, allowing you to simplify the above to:
 
 ```swift
 struct DataFrame {
@@ -189,10 +189,10 @@ let sequence = url.resourceBytes
 let results = sequence.iteratorMap { iterator -> DataFrame? in
     var payloadSize = try await iterator.next(bigEndian: UInt32.self)
     
-    let commandString = try await iterator.next(utf8StringUpToExcluding: 0, throwsIfOver: min(256, payloadSize))
+    let commandString = try await iterator.next(utf8: String.self, upToExcluding: 0, throwsIfOver: min(256, payloadSize))
     payloadSize -= commandString.utf8.count - 1 // Don't forget the null byte we skipped
     
-    guard let payloadBytes = try await iterator.count(payloadSize) else { throw DataFrameError.missingPayload }
+    let payloadBytes = try await iterator.next(bytes: Bytes.self, count: payloadSize)
     
     return DataFrame(command: commandString, payload: payloadBytes)
 }
