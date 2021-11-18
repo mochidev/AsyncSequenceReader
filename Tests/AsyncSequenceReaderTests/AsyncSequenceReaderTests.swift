@@ -10,6 +10,8 @@ import XCTest
 @testable import AsyncSequenceReader
 
 final class AsyncSequenceReaderTests: XCTestCase {
+    
+    // test transform not called when stream is empty
     // MARK: - Test Manual Iteration
     
     func testReadSequenceFromStream() async throws {
