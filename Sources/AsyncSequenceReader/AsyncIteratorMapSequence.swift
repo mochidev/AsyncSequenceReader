@@ -11,7 +11,7 @@ extension AsyncSequence {
     
     /// Creates an asynchronous sequence that maps the given closure over an iterator for the sequence, which can itself accept multiple reads.
     ///
-    /// When finished reading from the iterator, return your completed object, and the closure will be called again with an terator configured to continue where the first one finished.
+    /// When finished reading from the iterator, return your completed object, and the closure will be called again with an iterator configured to continue where the first one finished.
     ///
     /// In this example, an asynchronous sequence of Strings encodes sentences by prefixing each word sequence with a number.
     /// The number indicates how many words will be read and concatenated into a complete sentence.
@@ -48,7 +48,7 @@ extension AsyncSequence {
     
     /// Creates an asynchronous sequence that maps the given closure over an iterator for the sequence, which can itself accept multiple reads.
     ///
-    /// When finished reading from the iterator, return your completed object, and the closure will be called again with an terator configured to continue where the first one finished.
+    /// When finished reading from the iterator, return your completed object, and the closure will be called again with an iterator configured to continue where the first one finished.
     ///
     /// In this example, an asynchronous sequence of Strings encodes sentences by prefixing each word sequence with a number.
     /// The number indicates how many words will be read and concatenated into a complete sentence.
