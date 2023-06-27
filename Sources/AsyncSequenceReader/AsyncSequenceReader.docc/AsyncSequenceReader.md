@@ -84,7 +84,7 @@ var veryLargeSequence = try await iterator.collect(1024*1024*1024) { sequence ->
         return DataFrame(values)
     }
     
-    let averages = tray await results.reduce(into: []) { $0.append($1.average) }
+    let averages = try await results.reduce(into: []) { $0.append($1.average) }
     return Summary(averages)
 }
 ```
@@ -108,7 +108,7 @@ Note how a ``throwsIfOver`` parameter is necessary — this is to prevent un-bou
 
 You can bypass the `throwsIfOver` parameter if you use a **sequence transform** instead, which may be a better option if your algorithm deals with large amounts of data. If you stop reading early, elements can still be read by subsequent requests, giving you more control over how to read your data.
 
-Also note that is you use a **sequence transform**, you can only collect a sequence up to and including your terminator, and no error will be thrown if your terminator was never encountered, since you can easily check `result.suffix(termination.count) == termination` to verify this yourself, allowing you the possibility of handling different data lengths yourself.
+Also note that if you use a **sequence transform**, you can only collect a sequence up to and including your terminator, and no error will be thrown if your terminator was never encountered, since you can easily check `result.suffix(termination.count) == termination` to verify this yourself, allowing you the possibility of handling different data lengths yourself.
 
 ### Integration with Bytes
 
