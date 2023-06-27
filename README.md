@@ -22,7 +22,7 @@ Please check the [releases](https://github.com/mochidev/AsyncSequenceReader/rele
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/mochidev/AsyncSequenceReader.git", .upToNextMinor(from: "0.1.0")),
+    .package(url: "https://github.com/mochidev/AsyncSequenceReader.git", .upToNextMinor(from: "0.1.2")),
 ],
 ...
 targets: [
@@ -209,6 +209,6 @@ For more examples, please take a look at the unit tests provided in this package
 
 ## Contributing
 
-Contribution is welcome! Please take a look at the issues already available, or start a new issue to discuss a new feature. Although guarantees can't be made regarding feature requests, PRs that fit with the goals of the project and that have been discussed before hand are more than welcome!
+Contribution is welcome! Please take a look at the issues already available, or start a new discussion to propose a new feature. Although guarantees can't be made regarding feature requests, PRs that fit within the goals of the project and that have been discussed beforehand are more than welcome!
 
-Please make sure that all submissions have clean commit histories, are well documented, and thoroughly tested. **Please rebase your PR** before submission rather than merge in `main`. Linear histories are required.
+Please make sure that all submissions have clean commit histories, are well documented, and thoroughly tested. **Please rebase your PR** before submission rather than merge in `main`. Linear histories are required, so merge commits in PRs will not be accepted.
