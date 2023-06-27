@@ -1,49 +1,12 @@
-# AsyncSequenceReader
+# ``AsyncSequenceReader``
 
-<p align="center">
-<a href="https://swiftpackageindex.com/mochidev/AsyncSequenceReader">
-<img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmochidev%2FAsyncSequenceReader%2Fbadge%3Ftype%3Dswift-versions" />
-</a>
-<a href="https://swiftpackageindex.com/mochidev/AsyncSequenceReader">
-<img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmochidev%2FAsyncSequenceReader%2Fbadge%3Ftype%3Dplatforms" />
-</a>
-<a href="https://github.com/mochidev/AsyncSequenceReader/actions?query=workflow%3A%22Test+AsyncSequenceReader%22">
-<img src="https://github.com/mochidev/AsyncSequenceReader/workflows/Test%20AsyncSequenceReader/badge.svg" alt="Test Status" />
-</a>
-</p>
+``AsyncSequenceReader`` provides building blocks to easily consume Swift's ``/Swift/AsyncSequence``.
 
-`AsyncSequenceReader` provides building blocks to easily consume Swift's `AsyncSequence`.
+## What is ``AsyncSequenceReader``?
 
-## Quick Links
+``AsyncSequenceReader`` is a collection of building blocks to make it easy to read information and transform `AsyncSequence` into data types your app understands.
 
-- [Documentation](https://swiftpackageindex.com/mochidev/AsyncSequenceReader/documentation)
-
-## Installation
-
-Add `AsyncSequenceReader` as a dependency in your `Package.swift` file to start using it. Then, add `import AsyncSequenceReader` to any file you wish to use the library in.
-
-Please check the [releases](https://github.com/mochidev/AsyncSequenceReader/releases) for recommended versions.
-
-```swift
-dependencies: [
-    .package(url: "https://github.com/mochidev/AsyncSequenceReader.git", .upToNextMinor(from: "0.1.2")),
-],
-...
-targets: [
-    .target(
-        name: "MyPackage",
-        dependencies: [
-            "AsyncSequenceReader",
-        ]
-    )
-]
-```
-
-## What is `AsyncSequenceReader`?
-
-`AsyncSequenceReader` is a collection of building blocks to make it easy to read information and transform `AsyncSequence` into data types your app understands.
-
-Although an `AsyncSequence` can be consumed via a `for await` loop, that isn't often the easiest way of consuming that data:
+Although an ``/Swift/AsyncSequence`` can be consumed via a `for await` loop, that isn't often the easiest way of consuming that data:
 
 ```swift
 
@@ -57,7 +20,7 @@ for await byte in url.resourceBytes {
 
 If the serialization format is more complicated than that, it can be significantly harder to write easy to read and understandable code that can be easily maintained.
 
-`AsyncSequenceReader` provides 3 primary tools to help you with this: Iterator Maps, Counted Collections, and Terminated Collections.
+``AsyncSequenceReader`` provides 3 primary tools to help you with this: Iterator Maps, Counted Collections, and Terminated Collections.
 
 ### Iterator Maps
 
@@ -93,7 +56,7 @@ Reading values is as easy as calling `let value = try await iterator.next()`. Th
 
 Note: Resist the urge to catch errors within an iterator map, as once a value is read, it will no longer be available.
 
-Returning an object will make it available to whoever is consuming the resulting sequence, preparing your closure to be called again for the next object. Do note that Your closure will not be called unless something consumes your `results` sequence, either via `for await`, or by using `.reduce` or other `AsyncSequence` methods.
+Returning an object will make it available to whoever is consuming the resulting sequence, preparing your closure to be called again for the next object. Do note that Your closure will not be called unless something consumes your `results` sequence, either via `for await`, or by using `.reduce` or other ``/Swift/AsyncSequence`` methods.
 
 Note: Do not copy the iterator to other methods without marking it as `inout`, since as a value type, a copy will be made, and further reads may become out of sync.
 
@@ -141,7 +104,7 @@ var httpHeaderEntry = try await iterator.collect(upToExcluding: ["\r".asciiValue
 
 This is especially useful when scanning for strings or other known boundaries, allowing you get get an array of elements either including or excluding the terminator you specified.
 
-Note how a `throwsIfOver` parameter is necessary — this is to prevent un-bounded reads from running out of control. If the terminator is not detected, or your maximum element allowance has been reached, an `AsyncSequenceReaderError.terminationNotFound` error will be thrown.
+Note how a ``throwsIfOver`` parameter is necessary — this is to prevent un-bounded reads from running out of control. If the terminator is not detected, or your maximum element allowance has been reached, an ``AsyncSequenceReaderError/terminationNotFound`` error will be thrown.
 
 You can bypass the `throwsIfOver` parameter if you use a **sequence transform** instead, which may be a better option if your algorithm deals with large amounts of data. If you stop reading early, elements can still be read by subsequent requests, giving you more control over how to read your data.
 
@@ -149,7 +112,7 @@ Also note that is you use a **sequence transform**, you can only collect a seque
 
 ### Integration with Bytes
 
-`AsyncSequenceReader` really shines when you combine it with [Bytes](https://github.com/mochidev/Bytes), another package specialized in dealing with and transforming byte sequences. For instance, if you wanted to decode data frames that consist of a four byte payload size, a null terminated header string, and a payload, you could do so easily like this:
+``AsyncSequenceReader`` really shines when you combine it with [Bytes](https://github.com/mochidev/Bytes), another package specialized in dealing with and transforming byte sequences. For instance, if you wanted to decode data frames that consist of a four byte payload size, a null terminated header string, and a payload, you could do so easily like this:
 
 ```swift
 struct DataFrame {
@@ -206,13 +169,3 @@ for await dataFrame in results {
     print(dataFrame)
 }
 ```
-
-### More
-
-For more examples, please take a look at the unit tests provided in this package. If a good example isn't listed, please consider submitting a PR to show how it's done!
-
-## Contributing
-
-Contribution is welcome! Please take a look at the issues already available, or start a new discussion to propose a new feature. Although guarantees can't be made regarding feature requests, PRs that fit within the goals of the project and that have been discussed beforehand are more than welcome!
-
-Please make sure that all submissions have clean commit histories, are well documented, and thoroughly tested. **Please rebase your PR** before submission rather than merge in `main`. Linear histories are required, so merge commits in PRs will not be accepted.

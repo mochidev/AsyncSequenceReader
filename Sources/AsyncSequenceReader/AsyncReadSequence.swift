@@ -10,7 +10,7 @@
 
 /// An AsyncSequence subtype suitable for reading an existing iterator in place.
 ///
-/// Note that to conform to this protocol, your type must be a reference type. After iterating, you'll also likely want to copy the base iterator back into your starting iterator, as shown in ``AsyncIteratorProtocol.transform(with:readSequenceFactory:)``.
+/// Note that to conform to this protocol, your type must be a reference type. After iterating, you'll also likely want to copy the base iterator back into your starting iterator, as shown in ``AsyncIteratorProtocol/transform(with:readSequenceFactory:)``.
 public protocol AsyncReadSequence : AsyncSequence, AnyObject {
     associatedtype BaseIterator : AsyncIteratorProtocol where BaseIterator.Element == Element
     
