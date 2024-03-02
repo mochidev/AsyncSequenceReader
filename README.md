@@ -86,14 +86,14 @@ for await dataFrame in results {
 
 Within the closure, you can do one of three things:
 - Read values and return an object (In this case a DataFrame),
-- Throw and error, cancelling the whole process,
+- Throw an error, cancelling the whole process,
 - Return `nil`, indicating the end of the sequence.
 
 Reading values is as easy as calling `let value = try await iterator.next()`. This value will match the type of the sequence, which is `UInt8` in the above example. If the value is nil, you've reached the end of the sequence. We'll take a look at other ways to read values momentarily.
 
 Note: Resist the urge to catch errors within an iterator map, as once a value is read, it will no longer be available.
 
-Returning an object will make it available to whoever is consuming the resulting sequence, preparing your closure to be called again for the next object. Do note that Your closure will not be called unless something consumes your `results` sequence, either via `for await`, or by using `.reduce` or other `AsyncSequence` methods.
+Returning an object will make it available to whoever is consuming the resulting sequence, preparing your closure to be called again for the next object. Do note that your closure will not be called unless something consumes your `results` sequence, either via `for await`, or by using `.reduce` or other `AsyncSequence` methods.
 
 Note: Do not copy the iterator to other methods without marking it as `inout`, since as a value type, a copy will be made, and further reads may become out of sync.
 
@@ -104,7 +104,7 @@ Reading values in an iterator map one at a time is useful, but often times we ne
 ```swift
 var fourByteSequence = try await iterator.collect(4) // [UInt8, UInt8, UInt8, UInt8]?
 var largeSequence = try await iterator.collect(max: 256) // Array of [UInt8]? with a max size of 256, but may be shorter if the sequence had less than 256 characters available.
-var limitedSequence = try await iterator.collect(min: 128, max: 256) // Array of [UInt8]? that will throw if at least 128 bytes are available, but will be no larger than 256.
+var limitedSequence = try await iterator.collect(min: 128, max: 256) // Array of [UInt8]? that will throw if less than 128 bytes are available, but will be no larger than 256.
 ```
 
 For that last example, do note that the `limitedSequence` will only become available if and when all the bytes have been read. ie. you will not get results back if only 128 bytes are available _right now_, if the sequence is still ongoing.
