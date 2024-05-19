@@ -3,7 +3,7 @@
 //  AsyncSequenceReader
 //
 //  Created by Dimitri Bouniol on 2021-11-17.
-//  Copyright © 2021 Mochi Development, Inc. All rights reserved.
+//  Copyright © 2021-24 Mochi Development, Inc. All rights reserved.
 //
 
 #if compiler(>=5.5) && canImport(_Concurrency)
@@ -58,5 +58,7 @@ public struct AsyncBufferedIterator<BaseIterator: AsyncIteratorProtocol>: AsyncI
         return try await nextUnconsumed() != nil
     }
 }
+
+extension AsyncBufferedIterator: Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable {}
 
 #endif

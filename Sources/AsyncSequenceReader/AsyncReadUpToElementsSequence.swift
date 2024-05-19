@@ -3,7 +3,7 @@
 //  AsyncSequenceReader
 //
 //  Created by Dimitri Bouniol on 2021-11-17.
-//  Copyright © 2021 Mochi Development, Inc. All rights reserved.
+//  Copyright © 2021-24 Mochi Development, Inc. All rights reserved.
 //
 
 #if compiler(>=5.5) && canImport(_Concurrency)
@@ -513,4 +513,8 @@ extension AsyncReadUpToElementsSequence: AsyncSequence {
         AsyncIterator(self)
     }
 }
+
+extension AsyncReadUpToElementsSequence: @unchecked Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable {}
+extension AsyncReadUpToElementsSequence.AsyncIterator: @unchecked Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable, Element: Sendable {}
+
 #endif

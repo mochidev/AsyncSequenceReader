@@ -3,7 +3,7 @@
 //  AsyncSequenceReader
 //
 //  Created by Dimitri Bouniol on 2021-11-17.
-//  Copyright © 2021 Mochi Development, Inc. All rights reserved.
+//  Copyright © 2021-24 Mochi Development, Inc. All rights reserved.
 //
 
 #if compiler(>=5.5) && canImport(_Concurrency)
@@ -11,8 +11,8 @@
 /// An AsyncSequence subtype suitable for reading an existing iterator in place.
 ///
 /// Note that to conform to this protocol, your type must be a reference type. After iterating, you'll also likely want to copy the base iterator back into your starting iterator, as shown in ``AsyncIteratorProtocol/transform(with:readSequenceFactory:)``.
-public protocol AsyncReadSequence : AsyncSequence, AnyObject {
-    associatedtype BaseIterator : AsyncIteratorProtocol where BaseIterator.Element == Element
+public protocol AsyncReadSequence: AsyncSequence, AnyObject {
+    associatedtype BaseIterator: AsyncIteratorProtocol where BaseIterator.Element == Element
     
     @inlinable
     var baseIterator: AsyncBufferedIterator<BaseIterator> { get }

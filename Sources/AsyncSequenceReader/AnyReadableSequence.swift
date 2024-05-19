@@ -3,13 +3,13 @@
 //  AsyncSequenceReader
 //
 //  Created by Dimitri Bouniol on 2023-06-26.
-//  Copyright © 2021-23 Mochi Development, Inc. All rights reserved.
+//  Copyright © 2021-24 Mochi Development, Inc. All rights reserved.
 //
 
 /// A type-erased convenience type to normalize synchronous and asynchronous sequences into a common async type.
 public struct AnyReadableSequence<Element>: AsyncSequence {
     @usableFromInline
-    let makeUnderlyingIterator: () -> () async throws -> Element?
+    let makeUnderlyingIterator: @Sendable () -> () async throws -> Element?
     
     public struct AsyncIterator: AsyncIteratorProtocol {
         @usableFromInline
@@ -32,13 +32,13 @@ public struct AnyReadableSequence<Element>: AsyncSequence {
     }
     
     @inlinable
-    init(_ makeUnderlyingIterator: @escaping () -> () async throws -> Element?) {
+    init(_ makeUnderlyingIterator: @Sendable @escaping () -> () async throws -> Element?) {
         self.makeUnderlyingIterator = makeUnderlyingIterator
     }
     
     /// Initialize ``AnyReadableSequence`` with a sequence.
     @inlinable
-    public init<S: Sequence>(_ sequence: S) where S.Element == Element {
+    public init<S: Sequence & Sendable>(_ sequence: S) where S.Element == Element, Element: Sendable {
         self.init {
             var iterator = sequence.makeIterator()
             
@@ -48,7 +48,7 @@ public struct AnyReadableSequence<Element>: AsyncSequence {
     
     /// Initialize ``AnyReadableSequence`` with an async sequence.
     @inlinable
-    public init<S: AsyncSequence>(_ sequence: S) where S.Element == Element {
+    public init<S: AsyncSequence & Sendable>(_ sequence: S) where S.Element == Element, Element: Sendable {
         self.init {
             var iterator = sequence.makeAsyncIterator()
             
@@ -57,3 +57,5 @@ public struct AnyReadableSequence<Element>: AsyncSequence {
     }
 }
 
+extension AnyReadableSequence: Sendable where Element: Sendable {}
+extension AnyReadableSequence.AsyncIterator: @unchecked Sendable where Element: Sendable {}
