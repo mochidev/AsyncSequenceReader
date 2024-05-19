@@ -3,7 +3,7 @@
 //  AsyncSequenceReader
 //
 //  Created by Dimitri Bouniol on 2021-11-17.
-//  Copyright © 2021 Mochi Development, Inc. All rights reserved.
+//  Copyright © 2021-24 Mochi Development, Inc. All rights reserved.
 //
 
 #if compiler(>=5.5) && canImport(_Concurrency)
@@ -204,7 +204,7 @@ extension AsyncBufferedIterator {
 }
 
 /// An asynchronous sequence that will read from a mutable iterator so long as the specified conditions are valid.
-public class AsyncReadUpToCountSequence<BaseIterator: AsyncIteratorProtocol>: AsyncReadSequence {
+public final class AsyncReadUpToCountSequence<BaseIterator: AsyncIteratorProtocol>: AsyncReadSequence {
     /// The baseIterator to read from.
     ///
     /// When finished with the sequence, callers should read back this value so they can continue iterating on the sequence.
@@ -274,5 +274,8 @@ extension AsyncReadUpToCountSequence: AsyncSequence {
         AsyncIterator(self)
     }
 }
+
+extension AsyncReadUpToCountSequence: @unchecked Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable {}
+extension AsyncReadUpToCountSequence.AsyncIterator: @unchecked Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable, Element: Sendable {}
 
 #endif

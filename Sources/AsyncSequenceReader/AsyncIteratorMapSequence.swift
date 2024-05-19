@@ -3,12 +3,12 @@
 //  AsyncSequenceReader
 //
 //  Created by Dimitri Bouniol on 2021-11-17.
-//  Copyright © 2021 Mochi Development, Inc. All rights reserved.
+//  Copyright © 2021-24 Mochi Development, Inc. All rights reserved.
 //
 
 #if compiler(>=5.5) && canImport(_Concurrency)
+
 extension AsyncSequence {
-    
     /// Creates an asynchronous sequence that maps the given closure over an iterator for the sequence, which can itself accept multiple reads.
     ///
     /// When finished reading from the iterator, return your completed object, and the closure will be called again with an iterator configured to continue where the first one finished.
@@ -42,7 +42,7 @@ extension AsyncSequence {
     /// - Parameter transform: A mapping closure. `transform` accepts an iterator representing the original sequence as its parameter and returns a transformed value. Returning `nil` will stop the sequence early.
     /// - Returns: An asynchronous sequence that contains, in order, elements produced by the `transform` closure.
     @inlinable
-    public func iteratorMap<Transformed>(_ transform: @escaping (_ iterator: inout AsyncBufferedIterator<AsyncIterator>) async -> Transformed) -> AsyncIteratorMapSequence<Self, Transformed> {
+    public func iteratorMap<Transformed>(_ transform: @Sendable @escaping (_ iterator: inout AsyncBufferedIterator<AsyncIterator>) async -> Transformed) -> AsyncIteratorMapSequence<Self, Transformed> {
         AsyncIteratorMapSequence(self, transform: transform)
     }
     
@@ -91,17 +91,17 @@ extension AsyncSequence {
 }
 
 /// An asynchronous sequence that maps the given closure over the asynchronous sequence’s elements by providing it with the base sequence's iterator to assemble multiple reads into a single transformed object.
-public struct AsyncIteratorMapSequence<Base : AsyncSequence, Transformed> {
+public struct AsyncIteratorMapSequence<Base: AsyncSequence, Transformed> {
     @usableFromInline
     let base: Base
     
     @usableFromInline
-    let transform: (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async -> Transformed
+    let transform: @Sendable (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async -> Transformed
     
     @usableFromInline
     init(
         _ base: Base,
-        transform: @escaping (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async -> Transformed
+        transform: @Sendable @escaping (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async -> Transformed
     ) {
         self.base = base
         self.transform = transform
@@ -119,12 +119,12 @@ extension AsyncIteratorMapSequence: AsyncSequence {
         @usableFromInline
         var baseIterator: AsyncBufferedIterator<Base.AsyncIterator>
         @usableFromInline
-        let transform: (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async -> Transformed
+        let transform: @Sendable (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async -> Transformed
         
         @usableFromInline
         init(
             _ baseIterator: AsyncBufferedIterator<Base.AsyncIterator>,
-            transform: @escaping (inout AsyncBufferedIterator<Base.AsyncIterator>) async -> Transformed
+            transform: @Sendable @escaping (inout AsyncBufferedIterator<Base.AsyncIterator>) async -> Transformed
         ) {
             self.baseIterator = baseIterator
             self.transform = transform
@@ -206,5 +206,8 @@ extension AsyncThrowingIteratorMapSequence: AsyncSequence {
         AsyncIterator(AsyncBufferedIterator(base.makeAsyncIterator()), transform: transform)
     }
 }
+
+extension AsyncIteratorMapSequence: Sendable where Base: Sendable, Transformed: Sendable, Base.Element: Sendable, Base.AsyncIterator: Sendable {}
+extension AsyncIteratorMapSequence.AsyncIterator: Sendable where Base: Sendable, Base.AsyncIterator: Sendable, Transformed: Sendable, Element: Sendable, Base.Element: Sendable {}
 
 #endif
