@@ -85,7 +85,7 @@ extension AsyncSequence {
     /// - Parameter transform: A mapping closure. `transform` accepts an iterator representing the original sequence as its parameter and returns a transformed value. Returning `nil` will stop the sequence early, as will throwing an error.
     /// - Returns: An asynchronous sequence that contains, in order, elements produced by the `transform` closure.
     @inlinable
-    public func iteratorMap<Transformed>(_ transform: @escaping (_ iterator: inout AsyncBufferedIterator<AsyncIterator>) async throws -> Transformed) -> AsyncThrowingIteratorMapSequence<Self, Transformed> {
+    public func iteratorMap<Transformed>(_ transform: @Sendable @escaping (_ iterator: inout AsyncBufferedIterator<AsyncIterator>) async throws -> Transformed) -> AsyncThrowingIteratorMapSequence<Self, Transformed> {
         AsyncThrowingIteratorMapSequence(self, transform: transform)
     }
 }
@@ -148,17 +148,20 @@ extension AsyncIteratorMapSequence: AsyncSequence {
     }
 }
 
+extension AsyncIteratorMapSequence: Sendable where Base: Sendable, Transformed: Sendable, Base.Element: Sendable, Base.AsyncIterator: Sendable {}
+extension AsyncIteratorMapSequence.AsyncIterator: Sendable where Base: Sendable, Base.AsyncIterator: Sendable, Transformed: Sendable, Element: Sendable, Base.Element: Sendable {}
+
 public struct AsyncThrowingIteratorMapSequence<Base, Transformed> where Base : AsyncSequence {
     @usableFromInline
     let base: Base
     
     @usableFromInline
-    let transform: (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async throws -> Transformed
+    let transform: @Sendable (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async throws -> Transformed
     
     @usableFromInline
     init(
         _ base: Base,
-        transform: @escaping (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async throws -> Transformed
+        transform: @Sendable @escaping (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async throws -> Transformed
     ) {
         self.base = base
         self.transform = transform
@@ -173,13 +176,16 @@ extension AsyncThrowingIteratorMapSequence: AsyncSequence {
         var baseIterator: AsyncBufferedIterator<Base.AsyncIterator>
         
         @usableFromInline
-        let transform: (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async throws -> Transformed
+        let transform: @Sendable (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async throws -> Transformed
         
         @usableFromInline
         var encounteredError = false
         
         @usableFromInline
-        init(_ baseIterator: AsyncBufferedIterator<Base.AsyncIterator>, transform: @escaping (inout AsyncBufferedIterator<Base.AsyncIterator>) async throws -> Transformed) {
+        init(
+            _ baseIterator: AsyncBufferedIterator<Base.AsyncIterator>,
+            transform: @Sendable @escaping (inout AsyncBufferedIterator<Base.AsyncIterator>) async throws -> Transformed
+        ) {
             self.baseIterator = baseIterator
             self.transform = transform
         }
@@ -207,7 +213,7 @@ extension AsyncThrowingIteratorMapSequence: AsyncSequence {
     }
 }
 
-extension AsyncIteratorMapSequence: Sendable where Base: Sendable, Transformed: Sendable, Base.Element: Sendable, Base.AsyncIterator: Sendable {}
-extension AsyncIteratorMapSequence.AsyncIterator: Sendable where Base: Sendable, Base.AsyncIterator: Sendable, Transformed: Sendable, Element: Sendable, Base.Element: Sendable {}
+extension AsyncThrowingIteratorMapSequence: Sendable where Base: Sendable, Transformed: Sendable, Base.Element: Sendable, Base.AsyncIterator: Sendable {}
+extension AsyncThrowingIteratorMapSequence.AsyncIterator: Sendable where Base: Sendable, Base.AsyncIterator: Sendable, Transformed: Sendable, Element: Sendable, Base.Element: Sendable {}
 
 #endif
