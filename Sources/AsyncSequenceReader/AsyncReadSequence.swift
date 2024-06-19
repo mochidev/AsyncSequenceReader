@@ -29,7 +29,7 @@ extension AsyncIteratorProtocol {
     public mutating func transform<Transformed, ReadSequence: AsyncReadSequence>(
         with sequenceTransform: (ReadSequence) async throws -> Transformed,
         readSequenceFactory: (inout AsyncBufferedIterator<Self>) -> ReadSequence
-    ) async rethrows -> Transformed? where ReadSequence.BaseIterator == Self {
+    ) async throws -> Transformed? where ReadSequence.BaseIterator == Self {
         var results: Transformed? = nil
         var wrappedIterator = AsyncBufferedIterator(self)
         if try await wrappedIterator.hasMoreData() {
@@ -54,7 +54,7 @@ extension AsyncBufferedIterator {
     public mutating func transform<Transformed, ReadSequence: AsyncReadSequence>(
         with sequenceTransform: (ReadSequence) async throws -> Transformed,
         readSequenceFactory: (inout Self) -> ReadSequence
-    ) async rethrows -> Transformed? where ReadSequence.BaseIterator == BaseIterator {
+    ) async throws -> Transformed? where ReadSequence.BaseIterator == BaseIterator {
         
         var results: Transformed? = nil
         if try await self.hasMoreData() {
