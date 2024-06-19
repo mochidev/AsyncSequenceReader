@@ -82,7 +82,7 @@ extension AsyncIteratorProtocol {
     public mutating func collect<Transformed>(
         _ count: Int,
         sequenceTransform: (AsyncReadUpToCountSequence<Self>) async throws -> Transformed
-    ) async rethrows -> Transformed? {
+    ) async throws -> Transformed? {
         assert(count >= 0, "count must be larger than 0")
         return try await collect(min: count, max: count, sequenceTransform: sequenceTransform)
     }
@@ -121,7 +121,7 @@ extension AsyncIteratorProtocol {
         min minCount: Int = 0,
         max maxCount: Int,
         sequenceTransform: (AsyncReadUpToCountSequence<Self>) async throws -> Transformed
-    ) async rethrows -> Transformed? {
+    ) async throws -> Transformed? {
         try await transform(with: sequenceTransform) { .init($0, minCount: minCount, maxCount: maxCount) }
     }
 }
@@ -159,7 +159,7 @@ extension AsyncBufferedIterator {
     public mutating func collect<Transformed>(
         _ count: Int,
         sequenceTransform: (AsyncReadUpToCountSequence<BaseIterator>) async throws -> Transformed
-    ) async rethrows -> Transformed? {
+    ) async throws -> Transformed? {
         assert(count >= 0, "count must be larger than 0")
         return try await collect(min: count, max: count, sequenceTransform: sequenceTransform)
     }
@@ -198,7 +198,7 @@ extension AsyncBufferedIterator {
         min minCount: Int = 0,
         max maxCount: Int,
         sequenceTransform: (AsyncReadUpToCountSequence<BaseIterator>) async throws -> Transformed
-    ) async rethrows -> Transformed? {
+    ) async throws -> Transformed? {
         try await transform(with: sequenceTransform) { .init($0, minCount: minCount, maxCount: maxCount) }
     }
 }

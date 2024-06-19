@@ -16,7 +16,7 @@ final class AsyncReadUpToElementsSequenceTests: XCTestCase {
         let testStream = TestSequence(base: "apple orange banana kiwi kumquat pear pineapple")
         
         let results = testStream.iteratorMap { iterator -> String? in
-            let word = await iterator.collect(upToIncluding: " ") { sequence -> String in
+            let word = try await iterator.collect(upToIncluding: " ") { sequence -> String in
                 await sequence.reduce(into: "") { $0.append($1) }
             }
             
@@ -28,13 +28,13 @@ final class AsyncReadUpToElementsSequenceTests: XCTestCase {
         
         var resultsIterator = results.makeAsyncIterator()
         
-        await AsyncXCTAssertEqual(await resultsIterator.next(), "apple")
-        await AsyncXCTAssertEqual(await resultsIterator.next(), "orange")
-        await AsyncXCTAssertEqual(await resultsIterator.next(), "banana")
-        await AsyncXCTAssertEqual(await resultsIterator.next(), "kiwi")
-        await AsyncXCTAssertEqual(await resultsIterator.next(), "kumquat")
-        await AsyncXCTAssertEqual(await resultsIterator.next(), "pear")
-        await AsyncXCTAssertEqual(await resultsIterator.next(), "pineapple")
+        try await AsyncXCTAssertEqual(await resultsIterator.next(), "apple")
+        try await AsyncXCTAssertEqual(await resultsIterator.next(), "orange")
+        try await AsyncXCTAssertEqual(await resultsIterator.next(), "banana")
+        try await AsyncXCTAssertEqual(await resultsIterator.next(), "kiwi")
+        try await AsyncXCTAssertEqual(await resultsIterator.next(), "kumquat")
+        try await AsyncXCTAssertEqual(await resultsIterator.next(), "pear")
+        try await AsyncXCTAssertEqual(await resultsIterator.next(), "pineapple")
     }
     
     func testIteratorMapUpToIncluding() async throws {
