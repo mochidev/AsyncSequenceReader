@@ -9,7 +9,7 @@
 import XCTest
 @testable import AsyncSequenceReader
 
-final class AsyncBufferedIteratorTests: XCTestCase {
+final class AsyncBufferedIteratorTests: XCTestCase, @unchecked Sendable {
     func testBufferIteratorFromStream() async throws {
         let testStream = AsyncStream<Int> { continuation in
             for value in 0..<10 {

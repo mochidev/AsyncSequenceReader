@@ -9,7 +9,7 @@
 import XCTest
 @testable import AsyncSequenceReader
 
-final class AsyncReadUpToCountSequenceTests: XCTestCase {
+final class AsyncReadUpToCountSequenceTests: XCTestCase, @unchecked Sendable {
     func testIteratorMapFromStream() async throws {
         struct LocalError: Error {}
         
