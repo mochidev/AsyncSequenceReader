@@ -9,7 +9,7 @@
 import XCTest
 @testable import AsyncSequenceReader
 
-final class AsyncReadUpToElementsSequenceTests: XCTestCase {
+final class AsyncReadUpToElementsSequenceTests: XCTestCase, @unchecked Sendable {
     func testIteratorMapUpToIncludingSequence() async throws {
         struct LocalError: Error {}
         

@@ -9,7 +9,7 @@
 import XCTest
 @testable import AsyncSequenceReader
 
-final class AsyncIteratorMapSequenceTests: XCTestCase {
+final class AsyncIteratorMapSequenceTests: XCTestCase, @unchecked Sendable {
     func testIteratorMapFromStream() async throws {
         let testStream = AsyncStream<String> { continuation in
             let data = ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"]

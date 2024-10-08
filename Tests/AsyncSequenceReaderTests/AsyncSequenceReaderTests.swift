@@ -9,7 +9,7 @@
 import XCTest
 @testable import AsyncSequenceReader
 
-final class AsyncSequenceReaderTests: XCTestCase {
+final class AsyncSequenceReaderTests: XCTestCase, @unchecked Sendable {
     // MARK: - Test Manual Iteration
     
     func testReadSequenceFromStream() async throws {

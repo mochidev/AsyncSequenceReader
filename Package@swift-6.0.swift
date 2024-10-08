@@ -28,11 +28,15 @@ let package = Package(
             name: "AsyncSequenceReader",
             dependencies: [],
             swiftSettings: [
-                .swiftLanguageVersion(.v6),
+                .swiftLanguageMode(.v6),
             ]
         ),
         .testTarget(
             name: "AsyncSequenceReaderTests",
-            dependencies: ["AsyncSequenceReader"]),
+            dependencies: ["AsyncSequenceReader"],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
+        ),
     ]
 )
