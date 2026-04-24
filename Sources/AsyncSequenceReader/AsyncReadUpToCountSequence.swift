@@ -6,8 +6,6 @@
 //  Copyright © 2021-24 Mochi Development, Inc. All rights reserved.
 //
 
-#if compiler(>=5.5) && canImport(_Concurrency)
-
 extension AsyncIteratorProtocol {
     /// Asynchronously advances by the specified number of elements, or ends the sequence if there is no next element.
     ///
@@ -277,5 +275,3 @@ extension AsyncReadUpToCountSequence: AsyncSequence {
 
 extension AsyncReadUpToCountSequence: @unchecked Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable {}
 extension AsyncReadUpToCountSequence.AsyncIterator: @unchecked Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable, Element: Sendable {}
-
-#endif

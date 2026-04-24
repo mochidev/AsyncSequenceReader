@@ -6,8 +6,6 @@
 //  Copyright © 2021-24 Mochi Development, Inc. All rights reserved.
 //
 
-#if compiler(>=5.5) && canImport(_Concurrency)
-
 /// An asynchronous sequence that will read from a mutable iterator so long as the specified condition is valid.
 ///
 /// When finished, the iterator can be read back to read other values.
@@ -66,5 +64,3 @@ extension AsyncSequenceReader: AsyncSequence {
 
 extension AsyncSequenceReader: @unchecked Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable {}
 extension AsyncSequenceReader.AsyncIterator: @unchecked Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable, Element: Sendable {}
-
-#endif
