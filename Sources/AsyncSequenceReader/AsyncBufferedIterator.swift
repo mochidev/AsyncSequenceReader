@@ -6,8 +6,6 @@
 //  Copyright © 2021-24 Mochi Development, Inc. All rights reserved.
 //
 
-#if compiler(>=5.5) && canImport(_Concurrency)
-
 /// An iterator that wraps and can buffer another iterator, allowing safe reading ahead.
 public struct AsyncBufferedIterator<BaseIterator: AsyncIteratorProtocol>: AsyncIteratorProtocol {
     @usableFromInline
@@ -60,5 +58,3 @@ public struct AsyncBufferedIterator<BaseIterator: AsyncIteratorProtocol>: AsyncI
 }
 
 extension AsyncBufferedIterator: Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable {}
-
-#endif

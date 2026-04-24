@@ -6,8 +6,6 @@
 //  Copyright © 2021-24 Mochi Development, Inc. All rights reserved.
 //
 
-#if compiler(>=5.5) && canImport(_Concurrency)
-
 extension AsyncIteratorProtocol {
     
     /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, including the termination sequence.
@@ -516,5 +514,3 @@ extension AsyncReadUpToElementsSequence: AsyncSequence {
 
 extension AsyncReadUpToElementsSequence: @unchecked Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable {}
 extension AsyncReadUpToElementsSequence.AsyncIterator: @unchecked Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable, Element: Sendable {}
-
-#endif

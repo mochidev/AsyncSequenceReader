@@ -6,8 +6,6 @@
 //  Copyright © 2021-24 Mochi Development, Inc. All rights reserved.
 //
 
-#if compiler(>=5.5) && canImport(_Concurrency)
-
 extension AsyncSequence {
     /// Creates an asynchronous sequence that maps the given closure over an iterator for the sequence, which can itself accept multiple reads.
     ///
@@ -215,5 +213,3 @@ extension AsyncThrowingIteratorMapSequence: AsyncSequence {
 
 extension AsyncThrowingIteratorMapSequence: Sendable where Base: Sendable, Transformed: Sendable, Base.Element: Sendable, Base.AsyncIterator: Sendable {}
 extension AsyncThrowingIteratorMapSequence.AsyncIterator: Sendable where Base: Sendable, Base.AsyncIterator: Sendable, Transformed: Sendable, Element: Sendable, Base.Element: Sendable {}
-
-#endif
