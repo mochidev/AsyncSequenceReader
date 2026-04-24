@@ -70,7 +70,7 @@ extension AsyncIteratorProtocol {
         precondition(!termination.isEmpty, "stopSequence must not be empty")
         var result = [Element]()
         
-        while let next = try await next() {
+        while let next = try await _nextIsolated() {
             if result.count == maximumBufferSize {
                 throw AsyncSequenceReaderError.terminationNotFound(maximum: maximumBufferSize, actual: result.count)
             }
@@ -181,7 +181,7 @@ extension AsyncIteratorProtocol {
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     public mutating func collect<Transformed>(
         upToIncluding termination: Element,
-        sequenceTransform: (AsyncReadUpToElementsSequence<Self>) async -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self>) async -> Transformed
     ) async throws -> Transformed? where Element: Equatable {
         try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
     }
@@ -218,7 +218,7 @@ extension AsyncIteratorProtocol {
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     public mutating func collect<Transformed>(
         upToIncluding termination: [Element],
-        sequenceTransform: (AsyncReadUpToElementsSequence<Self>) async -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self>) async -> Transformed
     ) async throws -> Transformed? where Element: Equatable {
         try await transform(with: sequenceTransform) { .init($0, termination: termination) }
     }
@@ -255,7 +255,7 @@ extension AsyncIteratorProtocol {
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     public mutating func collect<Transformed>(
         upToIncluding termination: Element,
-        sequenceTransform: (AsyncReadUpToElementsSequence<Self>) async throws -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self>) async throws -> Transformed
     ) async throws -> Transformed? where Element: Equatable {
         try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
     }
@@ -292,7 +292,7 @@ extension AsyncIteratorProtocol {
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     public mutating func collect<Transformed>(
         upToIncluding termination: [Element],
-        sequenceTransform: (AsyncReadUpToElementsSequence<Self>) async throws -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self>) async throws -> Transformed
     ) async throws -> Transformed? where Element: Equatable {
         try await transform(with: sequenceTransform) { .init($0, termination: termination) }
     }
@@ -332,7 +332,7 @@ extension AsyncBufferedIterator {
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     public mutating func collect<Transformed>(
         upToIncluding termination: Element,
-        sequenceTransform: (AsyncReadUpToElementsSequence<Self>) async -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self>) async -> Transformed
     ) async throws -> Transformed? where Element: Equatable {
         try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
     }
@@ -369,7 +369,7 @@ extension AsyncBufferedIterator {
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     public mutating func collect<Transformed>(
         upToIncluding termination: [Element],
-        sequenceTransform: (AsyncReadUpToElementsSequence<BaseIterator>) async -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<BaseIterator>) async -> Transformed
     ) async throws -> Transformed? where Element: Equatable {
         try await transform(with: sequenceTransform) { .init($0, termination: termination) }
     }
@@ -406,7 +406,7 @@ extension AsyncBufferedIterator {
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     public mutating func collect<Transformed>(
         upToIncluding termination: Element,
-        sequenceTransform: (AsyncReadUpToElementsSequence<Self>) async throws -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self>) async throws -> Transformed
     ) async throws -> Transformed? where Element: Equatable {
         try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
     }
@@ -443,7 +443,7 @@ extension AsyncBufferedIterator {
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     public mutating func collect<Transformed>(
         upToIncluding termination: [Element],
-        sequenceTransform: (AsyncReadUpToElementsSequence<BaseIterator>) async throws -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<BaseIterator>) async throws -> Transformed
     ) async throws -> Transformed? where Element: Equatable {
         try await transform(with: sequenceTransform) { .init($0, termination: termination) }
     }

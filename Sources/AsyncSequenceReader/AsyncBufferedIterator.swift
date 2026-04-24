@@ -9,7 +9,7 @@
 /// An iterator that wraps and can buffer another iterator, allowing safe reading ahead.
 public struct AsyncBufferedIterator<BaseIterator: AsyncIteratorProtocol>: AsyncIteratorProtocol {
     @usableFromInline
-    var baseIterator: BaseIterator
+    nonisolated(unsafe) var baseIterator: BaseIterator
     
     /// The unconsumed buffer, including all reads that have been made before the user specifically requested them.
     ///
@@ -23,19 +23,25 @@ public struct AsyncBufferedIterator<BaseIterator: AsyncIteratorProtocol>: AsyncI
     }
     
     @inlinable
+    @_disfavoredOverload
     public mutating func next() async rethrows -> BaseIterator.Element? {
+        try await next()
+    }
+    
+    @inlinable
+    public mutating func next(isolation actor: isolated (any Actor)? = #isolation) async rethrows -> BaseIterator.Element? {
         guard unconsumedBuffer.isEmpty else {
             return unconsumedBuffer.removeFirst()
         }
         
-        return try await baseIterator.next()
+        return try await baseIterator._nextIsolated()
     }
     
     /// Read ahead, and store the value for later, or throw if the base iterator also throws.
     /// - Returns: The read-ahead value.
     @usableFromInline
-    mutating func nextUnconsumed() async rethrows -> BaseIterator.Element? {
-        let next = try await baseIterator.next()
+    mutating func nextUnconsumed(isolation actor: isolated (any Actor)? = #isolation) async rethrows -> BaseIterator.Element? {
+        let next = try await baseIterator._nextIsolated()
         if let value = next {
             unconsumedBuffer.append(value)
         }
@@ -48,7 +54,7 @@ public struct AsyncBufferedIterator<BaseIterator: AsyncIteratorProtocol>: AsyncI
     /// If it does, the iterator saves the elements, and will deliver them immediately on the next call to `next()`
     /// - Returns: A Bool indicating if there is more to consume or not.
     @inlinable
-    public mutating func hasMoreData() async rethrows -> Bool {
+    public mutating func hasMoreData(isolation actor: isolated (any Actor)? = #isolation) async rethrows -> Bool {
         guard unconsumedBuffer.isEmpty else {
             return true
         }
@@ -57,4 +63,4 @@ public struct AsyncBufferedIterator<BaseIterator: AsyncIteratorProtocol>: AsyncI
     }
 }
 
-extension AsyncBufferedIterator: Sendable where BaseIterator: Sendable, BaseIterator.Element: Sendable {}
+extension AsyncBufferedIterator: Sendable where BaseIterator.Element: Sendable {}

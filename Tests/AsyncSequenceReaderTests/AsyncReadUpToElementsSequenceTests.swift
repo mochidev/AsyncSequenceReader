@@ -17,7 +17,7 @@ final class AsyncReadUpToElementsSequenceTests: XCTestCase, @unchecked Sendable 
         
         let results = testStream.iteratorMap { iterator -> String? in
             let word = try await iterator.collect(upToIncluding: " ") { sequence -> String in
-                await sequence.reduce(into: "") { $0.append($1) }
+                try await sequence.reduce(into: "") { $0.append($1) }
             }
             
             if let word = word, word.hasSuffix(" ") {

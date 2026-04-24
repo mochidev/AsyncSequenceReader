@@ -4,6 +4,10 @@
 import PackageDescription
 
 let swiftSettings: [PackageDescription.SwiftSetting] = [
+    .enableUpcomingFeature("InternalImportsByDefault"),
+    .enableUpcomingFeature("MemberImportVisibility"),
+    .enableUpcomingFeature("InferIsolatedConformances"),
+    .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
     .enableUpcomingFeature("ImmutableWeakCaptures"),
 ]
 

@@ -25,13 +25,13 @@ extension AsyncIteratorProtocol {
     /// - Parameter readSequenceFactory: A factory to create a suitable ``AsyncReadSequence`` that will determine the logical bounds of the transformation within the receiving iterator.
     /// - Returns: A transformed value read from the iterator, or `nil` if there were no values left to read.
     public mutating func transform<Transformed, ReadSequence: AsyncReadSequence>(
-        with sequenceTransform: (ReadSequence) async throws -> Transformed,
+        with sequenceTransform: sending (sending ReadSequence) async throws -> Transformed,
         readSequenceFactory: (inout AsyncBufferedIterator<Self>) -> ReadSequence
     ) async throws -> Transformed? where ReadSequence.BaseIterator == Self {
         var results: Transformed? = nil
         var wrappedIterator = AsyncBufferedIterator(self)
         if try await wrappedIterator.hasMoreData() {
-            let readSequence = readSequenceFactory(&wrappedIterator)
+            nonisolated(unsafe) let readSequence = readSequenceFactory(&wrappedIterator)
             results = try await sequenceTransform(readSequence)
             wrappedIterator = readSequence.baseIterator
         }
@@ -50,13 +50,12 @@ extension AsyncBufferedIterator {
     /// - Parameter readSequenceFactory: A factory to create a suitable ``AsyncReadSequence`` that will determine the logical bounds of the transformation within the receiving iterator.
     /// - Returns: A transformed value read from the iterator, or `nil` if there were no values left to read.
     public mutating func transform<Transformed, ReadSequence: AsyncReadSequence>(
-        with sequenceTransform: (ReadSequence) async throws -> Transformed,
+        with sequenceTransform: sending (sending ReadSequence) async throws -> Transformed,
         readSequenceFactory: (inout Self) -> ReadSequence
     ) async throws -> Transformed? where ReadSequence.BaseIterator == BaseIterator {
-        
         var results: Transformed? = nil
         if try await self.hasMoreData() {
-            let readSequence = readSequenceFactory(&self)
+            nonisolated(unsafe) let readSequence = readSequenceFactory(&self)
             results = try await sequenceTransform(readSequence)
             self = readSequence.baseIterator
         }
