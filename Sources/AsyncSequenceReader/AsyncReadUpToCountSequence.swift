@@ -31,7 +31,7 @@ extension AsyncIteratorProtocol {
         var result = [Element]()
         result.reserveCapacity(minCount)
         
-        while let next = try await next() {
+        while let next = try await _nextIsolated() {
             result.append(next)
             
             if result.count == maxCount {
@@ -79,7 +79,7 @@ extension AsyncIteratorProtocol {
     /// - Throws: `AsyncSequenceReaderError.insufficientElements` if a complete byte sequence could not be returned by the time the sequence ended.
     public mutating func collect<Transformed>(
         _ count: Int,
-        sequenceTransform: (AsyncReadUpToCountSequence<Self>) async throws -> Transformed
+        sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self>) async throws -> Transformed
     ) async throws -> Transformed? {
         assert(count >= 0, "count must be larger than 0")
         return try await collect(min: count, max: count, sequenceTransform: sequenceTransform)
@@ -118,7 +118,7 @@ extension AsyncIteratorProtocol {
     public mutating func collect<Transformed>(
         min minCount: Int = 0,
         max maxCount: Int,
-        sequenceTransform: (AsyncReadUpToCountSequence<Self>) async throws -> Transformed
+        sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self>) async throws -> Transformed
     ) async throws -> Transformed? {
         try await transform(with: sequenceTransform) { .init($0, minCount: minCount, maxCount: maxCount) }
     }
@@ -156,7 +156,7 @@ extension AsyncBufferedIterator {
     /// - Throws: `AsyncSequenceReaderError.insufficientElements` if a complete byte sequence could not be returned by the time the sequence ended.
     public mutating func collect<Transformed>(
         _ count: Int,
-        sequenceTransform: (AsyncReadUpToCountSequence<BaseIterator>) async throws -> Transformed
+        sequenceTransform: sending (sending AsyncReadUpToCountSequence<BaseIterator>) async throws -> Transformed
     ) async throws -> Transformed? {
         assert(count >= 0, "count must be larger than 0")
         return try await collect(min: count, max: count, sequenceTransform: sequenceTransform)
@@ -195,7 +195,7 @@ extension AsyncBufferedIterator {
     public mutating func collect<Transformed>(
         min minCount: Int = 0,
         max maxCount: Int,
-        sequenceTransform: (AsyncReadUpToCountSequence<BaseIterator>) async throws -> Transformed
+        sequenceTransform: sending (sending AsyncReadUpToCountSequence<BaseIterator>) async throws -> Transformed
     ) async throws -> Transformed? {
         try await transform(with: sequenceTransform) { .init($0, minCount: minCount, maxCount: maxCount) }
     }
