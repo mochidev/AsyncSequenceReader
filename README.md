@@ -211,6 +211,10 @@ for await dataFrame in results {
 
 For more examples, please take a look at the unit tests provided in this package. If a good example isn't listed, please consider submitting a PR to show how it's done!
 
+## Version Compatibility
+
+The last version to support Swift 5.5 through Swift 5.10 is `0.3.1`. All never versions require a Swift 6 compiler.
+
 ## Contributing
 
 Contribution is welcome! Please take a look at the issues already available, or start a new discussion to propose a new feature. Although guarantees can't be made regarding feature requests, PRs that fit within the goals of the project and that have been discussed beforehand are more than welcome!
