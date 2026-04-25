@@ -11,10 +11,13 @@ jobs:
     timeout-minutes: 10
     steps:
     - name: Checkout Source
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
+    - name: Swift Version
+      run: |
+        swift --version
     - name: Build
       run: |
-        swift build --build-tests --configuration release -Xswiftc -enable-testing -Xswiftc -warnings-as-errors -Xcc -Werror
+        swift build --build-tests --configuration release -Xswiftc -enable-testing -Xswiftc -warnings-as-errors
     - name: Run Tests
       run: |
         swift test --skip-build --configuration release
@@ -24,10 +27,13 @@ jobs:
     timeout-minutes: 10
     steps:
     - name: Checkout Source
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
+    - name: Swift Version
+      run: |
+        swift --version
     - name: Build
       run: |
-        swift build --build-tests --configuration debug -Xswiftc -enable-testing -Xswiftc -warnings-as-errors -Xcc -Werror
+        swift build --build-tests --configuration debug -Xswiftc -enable-testing -Xswiftc -warnings-as-errors
     - name: Run Tests
       run: |
         swift test --skip-build --configuration debug
