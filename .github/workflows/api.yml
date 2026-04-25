@@ -5,6 +5,10 @@ on:
     branches:
     - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
+
 jobs:
   API-Check:
     name: Diagnose API Breaking Changes
