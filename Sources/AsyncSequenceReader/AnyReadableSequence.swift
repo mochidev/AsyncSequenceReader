@@ -9,14 +9,14 @@
 /// A type-erased convenience type to normalize synchronous and asynchronous sequences into a common async type.
 public struct AnyReadableSequence<Element>: AsyncSequence {
     @usableFromInline
-    let makeUnderlyingIterator: @Sendable () -> () async throws -> Element?
+    let makeUnderlyingIterator: @Sendable () -> @Sendable () async throws -> Element?
     
     public struct AsyncIterator: AsyncIteratorProtocol {
         @usableFromInline
-        let makeUnderlyingNext: () async throws -> Element?
+        let makeUnderlyingNext: @Sendable () async throws -> Element?
         
         @inlinable
-        init(_ makeUnderlyingNext: @escaping () async throws -> Element?) {
+        init(_ makeUnderlyingNext: @Sendable @escaping () async throws -> Element?) {
             self.makeUnderlyingNext = makeUnderlyingNext
         }
         
@@ -32,7 +32,7 @@ public struct AnyReadableSequence<Element>: AsyncSequence {
     }
     
     @inlinable
-    init(_ makeUnderlyingIterator: @Sendable @escaping () -> () async throws -> Element?) {
+    init(_ makeUnderlyingIterator: @Sendable @escaping () -> @Sendable () async throws -> Element?) {
         self.makeUnderlyingIterator = makeUnderlyingIterator
     }
     
@@ -40,7 +40,7 @@ public struct AnyReadableSequence<Element>: AsyncSequence {
     @inlinable
     public init<S: Sequence & Sendable>(_ sequence: S) where S.Element == Element, Element: Sendable {
         self.init {
-            var iterator = sequence.makeIterator()
+            nonisolated(unsafe) var iterator = sequence.makeIterator()
             
             return { iterator.next() }
         }
@@ -50,7 +50,7 @@ public struct AnyReadableSequence<Element>: AsyncSequence {
     @inlinable
     public init<S: AsyncSequence & Sendable>(_ sequence: S) where S.Element == Element, Element: Sendable {
         self.init {
-            var iterator = sequence.makeAsyncIterator()
+            nonisolated(unsafe) var iterator = sequence.makeAsyncIterator()
             
             return { try await iterator.next() }
         }
@@ -58,4 +58,4 @@ public struct AnyReadableSequence<Element>: AsyncSequence {
 }
 
 extension AnyReadableSequence: Sendable where Element: Sendable {}
-extension AnyReadableSequence.AsyncIterator: @unchecked Sendable where Element: Sendable {}
+extension AnyReadableSequence.AsyncIterator: Sendable where Element: Sendable {}
