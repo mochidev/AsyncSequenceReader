@@ -21,7 +21,7 @@ public struct AsyncSequenceReaderError: Error, Hashable, Sendable {
         "AsyncSequenceReaderError.\(String(describing: code))"
     }
     
-    static func ~= (lhs: Self, rhs: Error) -> Bool {
+    static func ~= (lhs: Self, rhs: any Error) -> Bool {
         lhs == rhs as? AsyncSequenceReaderError
     }
 }
