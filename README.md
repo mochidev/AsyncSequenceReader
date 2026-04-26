@@ -218,9 +218,16 @@ The last version to support Swift 5.5 through Swift 5.10 is `0.3.1`. All newer v
 
 ## Contributing
 
-Contribution is welcome! Please take a look at the issues already available, or start a new discussion to propose a new feature. Although guarantees can't be made regarding feature requests, PRs that fit within the goals of the project and that have been discussed beforehand are more than welcome!
+Contribution is welcome! Please take a look at the issues already available, or start a new discussion to propose a new feature. Although guarantees can't be made regarding feature requests, PRs that fit within the goals of the project and that _have been discussed beforehand_ are more than welcome!
+
+By submitting a pull request, you represent that you have the right to license your contribution to the community, and agree by submitting the patch that your contributions are licensed under our MIT-Derived No Model Training License (see [LICENSE](LICENSE)). Unfortunately, this limits contribution of most generated code. If you are submitting locally generated code in your patch, you are expected to make it clear:
+- which models were used,
+- how much of the patch was generated,
+- and maintain that you, the author, transformed that generated code substantially enough to hold the copyright to that patch and are capable of licensing those rights over to the community.
 
 Please make sure that all submissions have clean commit histories, are well documented, and thoroughly tested. **Please rebase your PR** before submission rather than merge in `main`. Linear histories are required, so merge commits in PRs will not be accepted.
+
+(New contributors are encouraged to add their apps to the bottom of the list below!)
 
 ## Support
 
