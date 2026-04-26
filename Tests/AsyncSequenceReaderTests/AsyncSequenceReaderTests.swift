@@ -7,13 +7,13 @@
 //  async-sequence-reader-watermark: 7E20A9CAB0604E89B17C6747A34F00C0
 //
 
-import XCTest
 @testable import AsyncSequenceReader
+import Testing
 
-final class AsyncSequenceReaderTests: XCTestCase, @unchecked Sendable {
+@Suite struct AsyncSequenceReaderTests {
     // MARK: - Test Manual Iteration
     
-    func testReadSequenceFromStream() async throws {
+    @Test func readSequenceFromStream() async throws {
         let testStream = AsyncStream<Int> { continuation in
             for value in 0..<10 {
                 continuation.yield(value)
@@ -30,10 +30,10 @@ final class AsyncSequenceReaderTests: XCTestCase, @unchecked Sendable {
         
         var readSequenceAIterator = readSequenceA.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await readSequenceAIterator.next(), 0)
-        try await AsyncXCTAssertEqual(await readSequenceAIterator.next(), 1)
-        try await AsyncXCTAssertEqual(await readSequenceAIterator.next(), 2)
-        try await AsyncXCTAssertEqual(await readSequenceAIterator.next(), 3)
+        #expect(try await readSequenceAIterator.next() == 0)
+        #expect(try await readSequenceAIterator.next() == 1)
+        #expect(try await readSequenceAIterator.next() == 2)
+        #expect(try await readSequenceAIterator.next() == 3)
         
         iterator = readSequenceA.baseIterator
         
@@ -47,20 +47,20 @@ final class AsyncSequenceReaderTests: XCTestCase, @unchecked Sendable {
         
         var readSequenceBIterator = readSequenceB.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), 4)
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), 5)
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), 6)
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), 7)
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), nil)
+        #expect(try await readSequenceBIterator.next() == 4)
+        #expect(try await readSequenceBIterator.next() == 5)
+        #expect(try await readSequenceBIterator.next() == 6)
+        #expect(try await readSequenceBIterator.next() == 7)
+        #expect(try await readSequenceBIterator.next() == nil)
         
         iterator = readSequenceB.baseIterator
         
-        await AsyncXCTAssertEqual(await iterator.next(), 8)
-        await AsyncXCTAssertEqual(await iterator.next(), 9)
-        await AsyncXCTAssertEqual(await iterator.next(), nil)
+        #expect(await iterator.next() == 8)
+        #expect(await iterator.next() == 9)
+        #expect(await iterator.next() == nil)
     }
     
-    func testReadSequenceFromTestSequence() async throws {
+    @Test func readSequenceFromTestSequence() async throws {
         let testStream = TestSequence(base: 0..<10)
         
         var iterator = AsyncBufferedIterator(testStream.makeAsyncIterator())
@@ -72,10 +72,10 @@ final class AsyncSequenceReaderTests: XCTestCase, @unchecked Sendable {
         
         var readSequenceAIterator = readSequenceA.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await readSequenceAIterator.next(), 0)
-        try await AsyncXCTAssertEqual(await readSequenceAIterator.next(), 1)
-        try await AsyncXCTAssertEqual(await readSequenceAIterator.next(), 2)
-        try await AsyncXCTAssertEqual(await readSequenceAIterator.next(), 3)
+        #expect(try await readSequenceAIterator.next() == 0)
+        #expect(try await readSequenceAIterator.next() == 1)
+        #expect(try await readSequenceAIterator.next() == 2)
+        #expect(try await readSequenceAIterator.next() == 3)
         
         iterator = readSequenceA.baseIterator
         
@@ -89,20 +89,20 @@ final class AsyncSequenceReaderTests: XCTestCase, @unchecked Sendable {
         
         var readSequenceBIterator = readSequenceB.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), 4)
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), 5)
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), 6)
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), 7)
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), nil)
+        #expect(try await readSequenceBIterator.next() == 4)
+        #expect(try await readSequenceBIterator.next() == 5)
+        #expect(try await readSequenceBIterator.next() == 6)
+        #expect(try await readSequenceBIterator.next() == 7)
+        #expect(try await readSequenceBIterator.next() == nil)
         
         iterator = readSequenceB.baseIterator
         
-        await AsyncXCTAssertEqual(await iterator.next(), 8)
-        await AsyncXCTAssertEqual(await iterator.next(), 9)
-        await AsyncXCTAssertEqual(await iterator.next(), nil)
+        #expect(await iterator.next() == 8)
+        #expect(await iterator.next() == 9)
+        #expect(await iterator.next() == nil)
     }
     
-    func testReadSequenceFromThrowingTestSequence() async throws {
+    @Test func readSequenceFromThrowingTestSequence() async throws {
         let testStream = ThrowingTestSequence(base: 0..<10)
         
         var iterator = AsyncBufferedIterator(testStream.makeAsyncIterator())
@@ -114,10 +114,10 @@ final class AsyncSequenceReaderTests: XCTestCase, @unchecked Sendable {
         
         var readSequenceAIterator = readSequenceA.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await readSequenceAIterator.next(), 0)
-        try await AsyncXCTAssertEqual(await readSequenceAIterator.next(), 1)
-        try await AsyncXCTAssertEqual(await readSequenceAIterator.next(), 2)
-        try await AsyncXCTAssertEqual(await readSequenceAIterator.next(), 3)
+        #expect(try await readSequenceAIterator.next() == 0)
+        #expect(try await readSequenceAIterator.next() == 1)
+        #expect(try await readSequenceAIterator.next() == 2)
+        #expect(try await readSequenceAIterator.next() == 3)
         
         iterator = readSequenceA.baseIterator
         
@@ -131,17 +131,17 @@ final class AsyncSequenceReaderTests: XCTestCase, @unchecked Sendable {
         
         var readSequenceBIterator = readSequenceB.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), 4)
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), 5)
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), 6)
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), 7)
-        try await AsyncXCTAssertEqual(await readSequenceBIterator.next(), nil)
+        #expect(try await readSequenceBIterator.next() == 4)
+        #expect(try await readSequenceBIterator.next() == 5)
+        #expect(try await readSequenceBIterator.next() == 6)
+        #expect(try await readSequenceBIterator.next() == 7)
+        #expect(try await readSequenceBIterator.next() == nil)
         
         iterator = readSequenceB.baseIterator
         
-        try await AsyncXCTAssertEqual(await iterator.next(), 8)
-        try await AsyncXCTAssertEqual(await iterator.next(), 9)
-        try await AsyncXCTAssertEqual(await iterator.next(), nil)
+        #expect(try await iterator.next() == 8)
+        #expect(try await iterator.next() == 9)
+        #expect(try await iterator.next() == nil)
     }
     
     // MARK: - Test Transforms
@@ -162,7 +162,7 @@ final class AsyncSequenceReaderTests: XCTestCase, @unchecked Sendable {
         }
     }
     
-    func testTransformSequenceFromStream() async throws {
+    @Test func transformSequenceFromStream() async throws {
         let testStream = AsyncStream<String> { continuation in
             let data = ["A", "few", "words", "to", "consider", "today", "as", "this", "test", "runs"]
             for value in data {
@@ -172,16 +172,16 @@ final class AsyncSequenceReaderTests: XCTestCase, @unchecked Sendable {
         }
         
         var iterator = testStream.makeAsyncIterator()
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 11)
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 19)
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 8)
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), nil)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 11)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 19)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 8)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == nil)
         
         var iteratorB = testStream.makeAsyncIterator()
-        try await AsyncXCTAssertEqual(await iteratorB.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), nil)
+        #expect(try await iteratorB.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == nil)
     }
     
-    func testTransformSequenceFromBufferedStream() async throws {
+    @Test func transformSequenceFromBufferedStream() async throws {
         let testStream = AsyncStream<String> { continuation in
             let data = ["A", "few", "words", "to", "consider", "today", "as", "this", "test", "runs"]
             for value in data {
@@ -191,38 +191,38 @@ final class AsyncSequenceReaderTests: XCTestCase, @unchecked Sendable {
         }
         
         var iterator = AsyncBufferedIterator(testStream.makeAsyncIterator())
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 11)
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 19)
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 8)
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), nil)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 11)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 19)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 8)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == nil)
         
         var iteratorB = AsyncBufferedIterator(testStream.makeAsyncIterator())
-        try await AsyncXCTAssertEqual(await iteratorB.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), nil)
+        #expect(try await iteratorB.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == nil)
     }
     
-    func testTransformSequenceFromTestSequence() async throws {
+    @Test func transformSequenceFromTestSequence() async throws {
         let testStream = TestSequence(base: ["A", "few", "words", "to", "consider", "today", "as", "this", "test", "runs"])
         
         var iterator = testStream.makeAsyncIterator()
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 11)
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 19)
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 8)
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), nil)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 11)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 19)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 8)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == nil)
         
         var iteratorB = testStream.makeAsyncIterator()
-        try await AsyncXCTAssertEqual(await iteratorB.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 11)
+        #expect(try await iteratorB.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 11)
     }
     
-    func testTransformSequenceFromThrowingTestSequence() async throws {
+    @Test func transformSequenceFromThrowingTestSequence() async throws {
         let testStream = ThrowingTestSequence(base: ["A", "few", "words", "to", "consider", "today", "as", "this", "test", "runs"])
         
         var iterator = testStream.makeAsyncIterator()
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 11)
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 19)
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 8)
-        try await AsyncXCTAssertEqual(await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), nil)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 11)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 19)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 8)
+        #expect(try await iterator.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == nil)
         
         var iteratorB = testStream.makeAsyncIterator()
-        try await AsyncXCTAssertEqual(await iteratorB.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence), 11)
+        #expect(try await iteratorB.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 11)
     }
 }

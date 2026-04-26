@@ -7,11 +7,11 @@
 //  async-sequence-reader-watermark: 7E20A9CAB0604E89B17C6747A34F00C0
 //
 
-import XCTest
 @testable import AsyncSequenceReader
+import Testing
 
-final class AsyncReadUpToElementsSequenceTests: XCTestCase, @unchecked Sendable {
-    func testIteratorMapUpToIncludingSequence() async throws {
+@Suite struct AsyncReadUpToElementsSequenceTests {
+    @Test func iteratorMapUpToIncludingSequence() async throws {
         struct LocalError: Error {}
         
         let testStream = TestSequence(base: "apple orange banana kiwi kumquat pear pineapple")
@@ -29,16 +29,16 @@ final class AsyncReadUpToElementsSequenceTests: XCTestCase, @unchecked Sendable 
         
         var resultsIterator = results.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "apple")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "orange")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "banana")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "kiwi")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "kumquat")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "pear")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "pineapple")
+        #expect(try await resultsIterator.next() == "apple")
+        #expect(try await resultsIterator.next() == "orange")
+        #expect(try await resultsIterator.next() == "banana")
+        #expect(try await resultsIterator.next() == "kiwi")
+        #expect(try await resultsIterator.next() == "kumquat")
+        #expect(try await resultsIterator.next() == "pear")
+        #expect(try await resultsIterator.next() == "pineapple")
     }
     
-    func testIteratorMapUpToIncluding() async throws {
+    @Test func iteratorMapUpToIncluding() async throws {
         struct LocalError: Error {}
         
         let testStream = TestSequence(base: "apple orange banana kiwi kumquat pear pineapple ")
@@ -49,16 +49,16 @@ final class AsyncReadUpToElementsSequenceTests: XCTestCase, @unchecked Sendable 
         
         var resultsIterator = results.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "apple")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "orange")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "banana")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "kiwi")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "kumquat")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "pear")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "pineapple")
+        #expect(try await resultsIterator.next() == "apple")
+        #expect(try await resultsIterator.next() == "orange")
+        #expect(try await resultsIterator.next() == "banana")
+        #expect(try await resultsIterator.next() == "kiwi")
+        #expect(try await resultsIterator.next() == "kumquat")
+        #expect(try await resultsIterator.next() == "pear")
+        #expect(try await resultsIterator.next() == "pineapple")
     }
     
-    func testIteratorMapUpToExcluding() async throws {
+    @Test func iteratorMapUpToExcluding() async throws {
         struct LocalError: Error {}
         
         let testStream = TestSequence(base: "apple orange banana kiwi kumquat pear pineapple ")
@@ -69,12 +69,12 @@ final class AsyncReadUpToElementsSequenceTests: XCTestCase, @unchecked Sendable 
         
         var resultsIterator = results.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "apple")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "orange")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "banana")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "kiwi")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "kumquat")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "pear")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "pineapple")
+        #expect(try await resultsIterator.next() == "apple")
+        #expect(try await resultsIterator.next() == "orange")
+        #expect(try await resultsIterator.next() == "banana")
+        #expect(try await resultsIterator.next() == "kiwi")
+        #expect(try await resultsIterator.next() == "kumquat")
+        #expect(try await resultsIterator.next() == "pear")
+        #expect(try await resultsIterator.next() == "pineapple")
     }
 }

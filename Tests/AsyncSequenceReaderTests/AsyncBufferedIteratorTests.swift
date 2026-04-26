@@ -7,11 +7,11 @@
 //  async-sequence-reader-watermark: 7E20A9CAB0604E89B17C6747A34F00C0
 //
 
-import XCTest
 @testable import AsyncSequenceReader
+import Testing
 
-final class AsyncBufferedIteratorTests: XCTestCase, @unchecked Sendable {
-    func testBufferIteratorFromStream() async throws {
+@Suite struct AsyncBufferedIteratorTests {
+    @Test func bufferIteratorFromStream() async throws {
         let testStream = AsyncStream<Int> { continuation in
             for value in 0..<10 {
                 continuation.yield(value)
@@ -21,98 +21,98 @@ final class AsyncBufferedIteratorTests: XCTestCase, @unchecked Sendable {
         
         var iterator = testStream.makeAsyncIterator()
         
-        await AsyncXCTAssertEqual(await iterator.next(), 0)
-        await AsyncXCTAssertEqual(await iterator.next(), 1)
+        #expect(await iterator.next() == 0)
+        #expect(await iterator.next() == 1)
         
         iterator = testStream.makeAsyncIterator()
         
-        await AsyncXCTAssertEqual(await iterator.next(), 2)
-        await AsyncXCTAssertEqual(await iterator.next(), 3)
+        #expect(await iterator.next() == 2)
+        #expect(await iterator.next() == 3)
         
         var bufferedIterator = AsyncBufferedIterator(iterator)
         
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 4)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), true)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), true)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), true)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 5)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 6)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 7)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 8)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), true)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 9)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), false)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), nil)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), false)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), false)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), nil)
+        #expect(await bufferedIterator.next() == 4)
+        #expect(await bufferedIterator.hasMoreData() == true)
+        #expect(await bufferedIterator.hasMoreData() == true)
+        #expect(await bufferedIterator.hasMoreData() == true)
+        #expect(await bufferedIterator.next() == 5)
+        #expect(await bufferedIterator.next() == 6)
+        #expect(await bufferedIterator.next() == 7)
+        #expect(await bufferedIterator.next() == 8)
+        #expect(await bufferedIterator.hasMoreData() == true)
+        #expect(await bufferedIterator.next() == 9)
+        #expect(await bufferedIterator.hasMoreData() == false)
+        #expect(await bufferedIterator.next() == nil)
+        #expect(await bufferedIterator.hasMoreData() == false)
+        #expect(await bufferedIterator.hasMoreData() == false)
+        #expect(await bufferedIterator.next() == nil)
     }
     
-    func testBufferIteratorFromTestSequence() async throws {
+    @Test func bufferIteratorFromTestSequence() async throws {
         let testStream = TestSequence(base: 0..<10)
         
         var iterator = testStream.makeAsyncIterator()
         
-        await AsyncXCTAssertEqual(await iterator.next(), 0)
-        await AsyncXCTAssertEqual(await iterator.next(), 1)
+        #expect(await iterator.next() == 0)
+        #expect(await iterator.next() == 1)
         
         iterator = testStream.makeAsyncIterator()
         
-        await AsyncXCTAssertEqual(await iterator.next(), 0)
-        await AsyncXCTAssertEqual(await iterator.next(), 1)
+        #expect(await iterator.next() == 0)
+        #expect(await iterator.next() == 1)
         
         var bufferedIterator = AsyncBufferedIterator(iterator)
         
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 2)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 3)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 4)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), true)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), true)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), true)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 5)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 6)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 7)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 8)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), true)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), 9)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), false)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), nil)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), false)
-        await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), false)
-        await AsyncXCTAssertEqual(await bufferedIterator.next(), nil)
+        #expect(await bufferedIterator.next() == 2)
+        #expect(await bufferedIterator.next() == 3)
+        #expect(await bufferedIterator.next() == 4)
+        #expect(await bufferedIterator.hasMoreData() == true)
+        #expect(await bufferedIterator.hasMoreData() == true)
+        #expect(await bufferedIterator.hasMoreData() == true)
+        #expect(await bufferedIterator.next() == 5)
+        #expect(await bufferedIterator.next() == 6)
+        #expect(await bufferedIterator.next() == 7)
+        #expect(await bufferedIterator.next() == 8)
+        #expect(await bufferedIterator.hasMoreData() == true)
+        #expect(await bufferedIterator.next() == 9)
+        #expect(await bufferedIterator.hasMoreData() == false)
+        #expect(await bufferedIterator.next() == nil)
+        #expect(await bufferedIterator.hasMoreData() == false)
+        #expect(await bufferedIterator.hasMoreData() == false)
+        #expect(await bufferedIterator.next() == nil)
     }
     
-    func testReadSequenceFromThrowingTestSequence() async throws {
+    @Test func readSequenceFromThrowingTestSequence() async throws {
         let testStream = ThrowingTestSequence(base: 0..<10)
         
         var iterator = testStream.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await iterator.next(), 0)
-        try await AsyncXCTAssertEqual(await iterator.next(), 1)
+        #expect(try await iterator.next() == 0)
+        #expect(try await iterator.next() == 1)
         
         iterator = testStream.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await iterator.next(), 0)
-        try await AsyncXCTAssertEqual(await iterator.next(), 1)
+        #expect(try await iterator.next() == 0)
+        #expect(try await iterator.next() == 1)
         
         var bufferedIterator = AsyncBufferedIterator(iterator)
         
-        try await AsyncXCTAssertEqual(await bufferedIterator.next(), 2)
-        try await AsyncXCTAssertEqual(await bufferedIterator.next(), 3)
-        try await AsyncXCTAssertEqual(await bufferedIterator.next(), 4)
-        try await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), true)
-        try await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), true)
-        try await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), true)
-        try await AsyncXCTAssertEqual(await bufferedIterator.next(), 5)
-        try await AsyncXCTAssertEqual(await bufferedIterator.next(), 6)
-        try await AsyncXCTAssertEqual(await bufferedIterator.next(), 7)
-        try await AsyncXCTAssertEqual(await bufferedIterator.next(), 8)
-        try await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), true)
-        try await AsyncXCTAssertEqual(await bufferedIterator.next(), 9)
-        try await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), false)
-        try await AsyncXCTAssertEqual(await bufferedIterator.next(), nil)
-        try await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), false)
-        try await AsyncXCTAssertEqual(await bufferedIterator.hasMoreData(), false)
-        try await AsyncXCTAssertEqual(await bufferedIterator.next(), nil)
+        #expect(try await bufferedIterator.next() == 2)
+        #expect(try await bufferedIterator.next() == 3)
+        #expect(try await bufferedIterator.next() == 4)
+        #expect(try await bufferedIterator.hasMoreData() == true)
+        #expect(try await bufferedIterator.hasMoreData() == true)
+        #expect(try await bufferedIterator.hasMoreData() == true)
+        #expect(try await bufferedIterator.next() == 5)
+        #expect(try await bufferedIterator.next() == 6)
+        #expect(try await bufferedIterator.next() == 7)
+        #expect(try await bufferedIterator.next() == 8)
+        #expect(try await bufferedIterator.hasMoreData() == true)
+        #expect(try await bufferedIterator.next() == 9)
+        #expect(try await bufferedIterator.hasMoreData() == false)
+        #expect(try await bufferedIterator.next() == nil)
+        #expect(try await bufferedIterator.hasMoreData() == false)
+        #expect(try await bufferedIterator.hasMoreData() == false)
+        #expect(try await bufferedIterator.next() == nil)
     }
 }

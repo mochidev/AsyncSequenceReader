@@ -7,11 +7,11 @@
 //  async-sequence-reader-watermark: 7E20A9CAB0604E89B17C6747A34F00C0
 //
 
-import XCTest
 @testable import AsyncSequenceReader
+import Testing
 
-final class AsyncReadUpToCountSequenceTests: XCTestCase, @unchecked Sendable {
-    func testIteratorMapFromStream() async throws {
+@Suite struct AsyncReadUpToCountSequenceTests {
+    @Test func iteratorMapFromStream() async throws {
         struct LocalError: Error {}
         
         let testStream = AsyncStream<String> { continuation in
@@ -36,13 +36,13 @@ final class AsyncReadUpToCountSequenceTests: XCTestCase, @unchecked Sendable {
         
         var resultsIterator = results.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "Hello, World!")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "My name is Dimitri.")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "Bye!")
+        #expect(try await resultsIterator.next() == "Hello, World!")
+        #expect(try await resultsIterator.next() == "My name is Dimitri.")
+        #expect(try await resultsIterator.next() == "")
+        #expect(try await resultsIterator.next() == "Bye!")
     }
     
-    func testIteratorMapFromInvalidStream() async throws {
+    @Test func iteratorMapFromInvalidStream() async throws {
         struct LocalError: Error {}
         
         let testStream = AsyncStream<String> { continuation in
@@ -67,18 +67,15 @@ final class AsyncReadUpToCountSequenceTests: XCTestCase, @unchecked Sendable {
         
         var resultsIterator = results.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "Hello, World!")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "My name is Dimitri.")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "")
-        do {
-            try await AsyncXCTAssertEqual(await resultsIterator.next(), "Bye!")
-            XCTFail("This should not succeed.")
-        } catch AsyncSequenceReaderError.insufficientElements(minimum: 2, actual: 1) {
-            
+        #expect(try await resultsIterator.next() == "Hello, World!")
+        #expect(try await resultsIterator.next() == "My name is Dimitri.")
+        #expect(try await resultsIterator.next() == "")
+        await #expect(throws: AsyncSequenceReaderError.insufficientElements(minimum: 2, actual: 1)) {
+            try await resultsIterator.next()
         }
     }
     
-    func testLooseIteratorMapFromInvalidStream() async throws {
+    @Test func looseIteratorMapFromInvalidStream() async throws {
         struct LocalError: Error {}
         
         let testStream = AsyncStream<String> { continuation in
@@ -103,13 +100,13 @@ final class AsyncReadUpToCountSequenceTests: XCTestCase, @unchecked Sendable {
         
         var resultsIterator = results.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "Hello, World!")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "My name is Dimitri.")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "Bye!")
+        #expect(try await resultsIterator.next() == "Hello, World!")
+        #expect(try await resultsIterator.next() == "My name is Dimitri.")
+        #expect(try await resultsIterator.next() == "")
+        #expect(try await resultsIterator.next() == "Bye!")
     }
     
-    func testIteratorMapFromTestSequence() async throws {
+    @Test func iteratorMapFromTestSequence() async throws {
         struct LocalError: Error {}
         
         let testStream = TestSequence(base: ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"])
@@ -128,13 +125,13 @@ final class AsyncReadUpToCountSequenceTests: XCTestCase, @unchecked Sendable {
         
         var resultsIterator = results.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "Hello, World!")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "My name is Dimitri.")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "Bye!")
+        #expect(try await resultsIterator.next() == "Hello, World!")
+        #expect(try await resultsIterator.next() == "My name is Dimitri.")
+        #expect(try await resultsIterator.next() == "")
+        #expect(try await resultsIterator.next() == "Bye!")
     }
     
-    func testIteratorMapFromInvalidTestSequence() async throws {
+    @Test func iteratorMapFromInvalidTestSequence() async throws {
         struct LocalError: Error {}
         
         let testStream = TestSequence(base: ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "2", "Bye!"])
@@ -153,18 +150,15 @@ final class AsyncReadUpToCountSequenceTests: XCTestCase, @unchecked Sendable {
         
         var resultsIterator = results.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "Hello, World!")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "My name is Dimitri.")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "")
-        do {
-            try await AsyncXCTAssertEqual(await resultsIterator.next(), "Bye!")
-            XCTFail("This should not succeed.")
-        } catch AsyncSequenceReaderError.insufficientElements(minimum: 2, actual: 1) {
-            
+        #expect(try await resultsIterator.next() == "Hello, World!")
+        #expect(try await resultsIterator.next() == "My name is Dimitri.")
+        #expect(try await resultsIterator.next() == "")
+        await #expect(throws: AsyncSequenceReaderError.insufficientElements(minimum: 2, actual: 1)) {
+            try await resultsIterator.next()
         }
     }
     
-    func testIteratorMapFromThrowingTestSequence() async throws {
+    @Test func iteratorMapFromThrowingTestSequence() async throws {
         struct LocalError: Error {}
         
         let testStream = ThrowingTestSequence(base: ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"])
@@ -183,13 +177,13 @@ final class AsyncReadUpToCountSequenceTests: XCTestCase, @unchecked Sendable {
         
         var resultsIterator = results.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "Hello, World!")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "My name is Dimitri.")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "Bye!")
+        #expect(try await resultsIterator.next() == "Hello, World!")
+        #expect(try await resultsIterator.next() == "My name is Dimitri.")
+        #expect(try await resultsIterator.next() == "")
+        #expect(try await resultsIterator.next() == "Bye!")
     }
     
-    func testIteratorMapFromInvalidThrowingTestSequence() async throws {
+    @Test func iteratorMapFromInvalidThrowingTestSequence() async throws {
         struct LocalError: Error {}
         
         let testStream = ThrowingTestSequence(base: ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "2", "Bye!"])
@@ -208,14 +202,11 @@ final class AsyncReadUpToCountSequenceTests: XCTestCase, @unchecked Sendable {
         
         var resultsIterator = results.makeAsyncIterator()
         
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "Hello, World!")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "My name is Dimitri.")
-        try await AsyncXCTAssertEqual(await resultsIterator.next(), "")
-        do {
-            try await AsyncXCTAssertEqual(await resultsIterator.next(), "Bye!")
-            XCTFail("This should not succeed.")
-        } catch AsyncSequenceReaderError.insufficientElements(minimum: 2, actual: 1) {
-            
+        #expect(try await resultsIterator.next() == "Hello, World!")
+        #expect(try await resultsIterator.next() == "My name is Dimitri.")
+        #expect(try await resultsIterator.next() == "")
+        await #expect(throws: AsyncSequenceReaderError.insufficientElements(minimum: 2, actual: 1)) {
+            try await resultsIterator.next()
         }
     }
 }
