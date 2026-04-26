@@ -17,6 +17,7 @@
 ## Quick Links
 
 - [Documentation](https://swiftpackageindex.com/mochidev/AsyncSequenceReader/documentation)
+- [Updates on Mastodon](https://mastodon.social/tags/AsyncSequenceReader)
 
 ## Installation
 
@@ -213,10 +214,16 @@ For more examples, please take a look at the unit tests provided in this package
 
 ## Version Compatibility
 
-The last version to support Swift 5.5 through Swift 5.10 is `0.3.1`. All never versions require a Swift 6 compiler.
+The last version to support Swift 5.5 through Swift 5.10 is `0.3.1`. All newer versions require a Swift 6 compiler.
 
 ## Contributing
 
 Contribution is welcome! Please take a look at the issues already available, or start a new discussion to propose a new feature. Although guarantees can't be made regarding feature requests, PRs that fit within the goals of the project and that have been discussed beforehand are more than welcome!
 
 Please make sure that all submissions have clean commit histories, are well documented, and thoroughly tested. **Please rebase your PR** before submission rather than merge in `main`. Linear histories are required, so merge commits in PRs will not be accepted.
+
+## Support
+
+To support this project, consider following [@dimitribouniol](https://mastodon.social/@dimitribouniol) on Mastodon, listening to Spencer and Dimitri on [Code Completion](https://mastodon.social/@codecompletion), or downloading our contributors’ apps:
+- [Jiiiii](https://jiiiii.app/) by [@dimitribouniol](https://mastodon.social/@dimitribouniol)
+- [Not Phở](https://notpho.app/) by [@lihnbouniol](https://mastodon.social/@lihnbouniol) and [@dimitribouniol](https://mastodon.social/@dimitribouniol)
