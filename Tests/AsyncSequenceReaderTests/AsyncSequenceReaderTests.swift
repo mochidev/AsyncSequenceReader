@@ -225,4 +225,44 @@ import Testing
         var iteratorB = testStream.makeAsyncIterator()
         #expect(try await iteratorB.transform(with: countCharacters, readSequenceFactory: makeReadFourElementSequence) == 11)
     }
+    
+    @Test func transformNotCalledForEmptyBufferedStream() async throws {
+        let testStream = AsyncStream<String> { continuation in
+            continuation.finish()
+        }
+        
+        var iterator = AsyncBufferedIterator(testStream.makeAsyncIterator())
+        #expect(try await iterator.transform(with: { sequence in
+            Issue.record("Transformation should never be called!")
+        }, readSequenceFactory: { iterator in
+            Issue.record("Factory should never be called!")
+            return AsyncSequenceReader(iterator) { await $0.next() }
+        }) == nil)
+    }
+    
+    @Test func transformNotCalledForEmptyTestSequence() async throws {
+        let testStream = TestSequence(base: [])
+        
+        var iterator = testStream.makeAsyncIterator()
+        #expect(try await iterator.transform(with: { sequence in
+            Issue.record("Transformation should never be called!")
+        }, readSequenceFactory: { iterator in
+            Issue.record("Factory should never be called!")
+            return AsyncSequenceReader(iterator) { await $0.next() }
+        }) == nil)
+    }
+    
+    @Test func transformNotCalledForEmptyStream() async throws {
+        let testStream = AsyncStream<String> { continuation in
+            continuation.finish()
+        }
+        
+        var iterator = testStream.makeAsyncIterator()
+        #expect(try await iterator.transform(with: { sequence in
+            Issue.record("Transformation should never be called!")
+        }, readSequenceFactory: { iterator in
+            Issue.record("Factory should never be called!")
+            return AsyncSequenceReader(iterator) { await $0.next() }
+        }) == nil)
+    }
 }
