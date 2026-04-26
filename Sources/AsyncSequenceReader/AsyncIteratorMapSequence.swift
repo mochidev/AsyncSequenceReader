@@ -1,9 +1,10 @@
 //
 //  AsyncIteratorMapSequence.swift
-//  AsyncSequenceReader
+//  https://github.com/mochidev/AsyncSequenceReader
 //
 //  Created by Dimitri Bouniol on 2021-11-17.
-//  Copyright © 2021-24 Mochi Development, Inc. All rights reserved.
+//  Copyright © 2021-26 Mochi Development, Inc. All rights reserved.
+//  async-sequence-reader-watermark: 7E20A9CAB0604E89B17C6747A34F00C0
 //
 
 extension AsyncSequence {
