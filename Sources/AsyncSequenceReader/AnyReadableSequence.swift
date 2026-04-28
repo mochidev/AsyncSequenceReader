@@ -39,7 +39,7 @@ public struct AnyReadableSequence<Element>: AsyncSequence {
     
     /// Initialize ``AnyReadableSequence`` with a sequence.
     @inlinable
-    public init<S: Sequence & Sendable>(_ sequence: S) where S.Element == Element, Element: Sendable {
+    public init<S: Sequence & Sendable>(_ sequence: S) where S.Element == Element {
         self.init {
             nonisolated(unsafe) var iterator = sequence.makeIterator()
             
@@ -49,7 +49,7 @@ public struct AnyReadableSequence<Element>: AsyncSequence {
     
     /// Initialize ``AnyReadableSequence`` with an async sequence.
     @inlinable
-    public init<S: AsyncSequence & Sendable>(_ sequence: S) where S.Element == Element, Element: Sendable {
+    public init<S: AsyncSequence & Sendable>(_ sequence: S) where S.Element == Element {
         self.init {
             nonisolated(unsafe) var iterator = sequence.makeAsyncIterator()
             
