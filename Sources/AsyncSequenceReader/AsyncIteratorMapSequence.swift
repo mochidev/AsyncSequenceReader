@@ -89,6 +89,88 @@ extension AsyncSequence {
     }
 }
 
+extension Sequence where Self: Sendable {
+    /// Creates an asynchronous sequence that maps the given closure over an iterator for the sequence, which can itself accept multiple reads.
+    ///
+    /// When finished reading from the iterator, return your completed object, and the closure will be called again with an iterator configured to continue where the first one finished.
+    ///
+    /// In this example, an asynchronous sequence of Strings encodes sentences by prefixing each word sequence with a number.
+    /// The number indicates how many words will be read and concatenated into a complete sentence.
+    ///
+    /// The closure provided to the `iteratorMap(_:)` first reads the first available string, interpreting it as a number.
+    /// Then, it will loop the specified number of times, accumulating those words into an array, that is finally assembled into a sentence.
+    ///
+    ///     let dataStream = ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"]
+    ///
+    ///     let sentenceStream = dataStream.iteratorMap { iterator -> String? in
+    ///         var count = Int(try await iterator.next() ?? "")!
+    ///
+    ///         var results: [String] = []
+    ///
+    ///         while count > 0, let next = try await iterator.next() {
+    ///             results.append(next)
+    ///             count -= 1
+    ///         }
+    ///
+    ///         return results.joined(separator: " ")
+    ///     }
+    ///
+    ///     for await sentence in sentenceStream {
+    ///         print("\"\(sentence)\"", terminator: ", ")
+    ///     }
+    ///     // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
+    ///
+    /// - Parameter transform: A mapping closure. `transform` accepts an iterator representing the original sequence as its parameter and returns a transformed value. Returning `nil` will stop the sequence early.
+    /// - Returns: An asynchronous sequence that contains, in order, elements produced by the `transform` closure.
+    @inlinable
+    public func iteratorMap<Transformed>(_ transform: sending @escaping (_ iterator: inout AsyncBufferedIterator<AnyReadableSequence<Element>.AsyncIterator>) async -> Transformed) -> AsyncIteratorMapSequence<AnyReadableSequence<Element>, Transformed> {
+        AsyncIteratorMapSequence(AnyReadableSequence(self), transform: transform)
+    }
+    
+    /// Creates an asynchronous sequence that maps the given closure over an iterator for the sequence, which can itself accept multiple reads.
+    ///
+    /// When finished reading from the iterator, return your completed object, and the closure will be called again with an iterator configured to continue where the first one finished.
+    ///
+    /// In this example, an asynchronous sequence of Strings encodes sentences by prefixing each word sequence with a number.
+    /// The number indicates how many words will be read and concatenated into a complete sentence.
+    ///
+    /// The closure provided to the `iteratorMap(_:)` first reads the first available string, interpreting it as a number.
+    /// Then, it will loop the specified number of times, accumulating those words into an array, that is finally assembled into a sentence.
+    ///
+    ///     let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"
+    ///
+    ///     let sentenceStream = dataStream.iteratorMap { iterator -> String? in
+    ///         guard var count = Int(try await iterator.next() ?? "") else {
+    ///             throw SentenceParsing.invalidWordCount
+    ///         }
+    ///
+    ///         var results: [String] = []
+    ///
+    ///         while count > 0, let next = try await iterator.next() {
+    ///             results.append(next)
+    ///             count -= 1
+    ///         }
+    ///
+    ///         guard count == 0 else {
+    ///             throw SentenceParsing.missingFinalWords
+    ///         }
+    ///
+    ///         return results.joined(separator: " ")
+    ///     }
+    ///
+    ///     for try await sentence in sentenceStream {
+    ///         print("\"\(sentence)\"", terminator: ", ")
+    ///     }
+    ///     // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
+    ///
+    /// - Parameter transform: A mapping closure. `transform` accepts an iterator representing the original sequence as its parameter and returns a transformed value. Returning `nil` will stop the sequence early, as will throwing an error.
+    /// - Returns: An asynchronous sequence that contains, in order, elements produced by the `transform` closure.
+    @inlinable
+    public func iteratorMap<Transformed>(_ transform: sending @escaping (_ iterator: inout AsyncBufferedIterator<AnyReadableSequence<Element>.AsyncIterator>) async throws -> Transformed) -> AsyncThrowingIteratorMapSequence<AnyReadableSequence<Element>, Transformed> {
+        AsyncThrowingIteratorMapSequence(AnyReadableSequence(self), transform: transform)
+    }
+}
+
 /// An asynchronous sequence that maps the given closure over the asynchronous sequence’s elements by providing it with the base sequence's iterator to assemble multiple reads into a single transformed object.
 public struct AsyncIteratorMapSequence<Base: AsyncSequence, Transformed> {
     @usableFromInline
