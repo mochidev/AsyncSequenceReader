@@ -198,11 +198,11 @@ import Testing
         let sequence = ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"]
         
         let results = sequence.iteratorMap { iterator -> String? in
-            var count = Int(try! await iterator.next() ?? "")!
+            var count = Int(await iterator.next() ?? "")!
             
             var results: [String] = []
             
-            while count > 0, let next = try! await iterator.next() {
+            while count > 0, let next = await iterator.next() {
                 results.append(next)
                 count -= 1
             }
@@ -212,11 +212,11 @@ import Testing
         
         var resultsIterator = results.makeAsyncIterator()
         
-        #expect(try await resultsIterator.next() == "Hello, World!")
-        #expect(try await resultsIterator.next() == "My name is Dimitri.")
-        #expect(try await resultsIterator.next() == "")
-        #expect(try await resultsIterator.next() == "Bye!")
-        #expect(try await resultsIterator.next() == nil)
+        #expect(await resultsIterator.next() == "Hello, World!")
+        #expect(await resultsIterator.next() == "My name is Dimitri.")
+        #expect(await resultsIterator.next() == "")
+        #expect(await resultsIterator.next() == "Bye!")
+        #expect(await resultsIterator.next() == nil)
     }
     
     @Test func iteratorMapFromInvalidSequence() async throws {
@@ -225,11 +225,11 @@ import Testing
         let sequence = ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "2", "Bye!"]
         
         let results = sequence.iteratorMap { iterator -> String? in
-            var count = Int(try await iterator.next() ?? "")!
+            var count = Int(await iterator.next() ?? "")!
             
             var results: [String] = []
             
-            while count > 0, let next = try await iterator.next() {
+            while count > 0, let next = await iterator.next() {
                 results.append(next)
                 count -= 1
             }

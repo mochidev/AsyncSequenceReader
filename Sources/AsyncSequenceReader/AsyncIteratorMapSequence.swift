@@ -123,7 +123,7 @@ extension Sequence where Self: Sendable {
     /// - Parameter transform: A mapping closure. `transform` accepts an iterator representing the original sequence as its parameter and returns a transformed value. Returning `nil` will stop the sequence early.
     /// - Returns: An asynchronous sequence that contains, in order, elements produced by the `transform` closure.
     @inlinable
-    public func iteratorMap<Transformed>(_ transform: sending @escaping (_ iterator: inout AsyncBufferedIterator<AnyReadableSequence<Element>.AsyncIterator>) async -> Transformed) -> AsyncIteratorMapSequence<AnyReadableSequence<Element>, Transformed> {
+    public func iteratorMap<Transformed>(_ transform: sending @escaping (_ iterator: inout AsyncBufferedIterator<AnyReadableSequence<Element, Never>.AsyncIterator>) async -> Transformed) -> AsyncIteratorMapSequence<AnyReadableSequence<Element, Never>, Transformed> {
         AsyncIteratorMapSequence(AnyReadableSequence(self), transform: transform)
     }
     
@@ -166,7 +166,7 @@ extension Sequence where Self: Sendable {
     /// - Parameter transform: A mapping closure. `transform` accepts an iterator representing the original sequence as its parameter and returns a transformed value. Returning `nil` will stop the sequence early, as will throwing an error.
     /// - Returns: An asynchronous sequence that contains, in order, elements produced by the `transform` closure.
     @inlinable
-    public func iteratorMap<Transformed>(_ transform: sending @escaping (_ iterator: inout AsyncBufferedIterator<AnyReadableSequence<Element>.AsyncIterator>) async throws -> Transformed) -> AsyncThrowingIteratorMapSequence<AnyReadableSequence<Element>, Transformed> {
+    public func iteratorMap<Transformed>(_ transform: sending @escaping (_ iterator: inout AsyncBufferedIterator<AnyReadableSequence<Element, Never>.AsyncIterator>) async throws -> Transformed) -> AsyncThrowingIteratorMapSequence<AnyReadableSequence<Element, Never>, Transformed> {
         AsyncThrowingIteratorMapSequence(AnyReadableSequence(self), transform: transform)
     }
 }
