@@ -39,6 +39,7 @@ import Testing
         #expect(await resultsIterator.next() == "My name is Dimitri.")
         #expect(await resultsIterator.next() == "")
         #expect(await resultsIterator.next() == "Bye!")
+        #expect(await resultsIterator.next() == nil)
     }
     
     @Test func iteratorMapFromInvalidStream() async throws {
@@ -101,6 +102,7 @@ import Testing
         #expect(await resultsIterator.next() == "My name is Dimitri.")
         #expect(await resultsIterator.next() == "")
         #expect(await resultsIterator.next() == "Bye!")
+        #expect(await resultsIterator.next() == nil)
     }
     
     @Test func iteratorMapFromInvalidTestSequence() async throws {
@@ -157,6 +159,7 @@ import Testing
         #expect(try await resultsIterator.next() == "My name is Dimitri.")
         #expect(try await resultsIterator.next() == "")
         #expect(try await resultsIterator.next() == "Bye!")
+        #expect(try await resultsIterator.next() == nil)
     }
     
     @Test func iteratorMapFromInvalidThrowingTestSequence() async throws {
@@ -165,6 +168,63 @@ import Testing
         let testStream = ThrowingTestSequence(base: ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "2", "Bye!"])
         
         let results = testStream.iteratorMap { iterator -> String? in
+            var count = Int(try await iterator.next() ?? "")!
+            
+            var results: [String] = []
+            
+            while count > 0, let next = try await iterator.next() {
+                results.append(next)
+                count -= 1
+            }
+            
+            guard count == 0 else {
+                throw LocalError()
+            }
+            
+            return results.joined(separator: " ")
+        }
+        
+        var resultsIterator = results.makeAsyncIterator()
+        
+        #expect(try await resultsIterator.next() == "Hello, World!")
+        #expect(try await resultsIterator.next() == "My name is Dimitri.")
+        #expect(try await resultsIterator.next() == "")
+        await #expect(throws: LocalError.self) {
+            try await resultsIterator.next()
+        }
+    }
+    
+    @Test func iteratorMapFromSequence() async throws {
+        let sequence = ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"]
+        
+        let results = sequence.iteratorMap { iterator -> String? in
+            var count = Int(try! await iterator.next() ?? "")!
+            
+            var results: [String] = []
+            
+            while count > 0, let next = try! await iterator.next() {
+                results.append(next)
+                count -= 1
+            }
+            
+            return results.joined(separator: " ")
+        }
+        
+        var resultsIterator = results.makeAsyncIterator()
+        
+        #expect(try await resultsIterator.next() == "Hello, World!")
+        #expect(try await resultsIterator.next() == "My name is Dimitri.")
+        #expect(try await resultsIterator.next() == "")
+        #expect(try await resultsIterator.next() == "Bye!")
+        #expect(try await resultsIterator.next() == nil)
+    }
+    
+    @Test func iteratorMapFromInvalidSequence() async throws {
+        struct LocalError: Error {}
+        
+        let sequence = ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "2", "Bye!"]
+        
+        let results = sequence.iteratorMap { iterator -> String? in
             var count = Int(try await iterator.next() ?? "")!
             
             var results: [String] = []

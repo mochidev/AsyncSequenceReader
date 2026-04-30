@@ -265,4 +265,55 @@ import Testing
             return AsyncSequenceReader(iterator) { await $0.next() }
         }) == nil)
     }
+    
+    @Test func transformDoesNotTrapsForUnreadBufferedStream() async throws {
+        let testStream = AsyncStream<String> { continuation in
+            continuation.yield("A")
+            continuation.finish()
+        }
+        
+        var iterator = AsyncBufferedIterator(testStream.makeAsyncIterator())
+        let result = try await iterator.transform(with: { sequence in
+            return ""
+        }, readSequenceFactory: { iterator in
+            AsyncSequenceReader(iterator) { await $0.next() }
+        })
+        #expect(result == "")
+        #expect(await iterator.next() == "A")
+    }
+    
+    @Test func transformTrapsForUnreadTestSequence() async throws {
+        let result = await #expect(processExitsWith: .failure, observing: [\.standardErrorContent]) {
+            let testStream = TestSequence(base: ["A"])
+            
+            var iterator = testStream.makeAsyncIterator()
+            let _ = try await iterator.transform(with: { sequence in
+                return ""
+            }, readSequenceFactory: { iterator in
+                AsyncSequenceReader(iterator) { await $0.next() }
+            })
+        }
+        #if DEBUG
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadSequence.swift:39: Precondition failed: A transform was requested, but the sequence was left in a state where the next value will never be read (fix: Use AnyReadableSequence(iterator) instead of calling `.transform` on `iterator` directly)")
+        #endif
+    }
+    
+    @Test func transformTrapsForUnreadEmptyStream() async throws {
+        let result = await #expect(processExitsWith: .failure, observing: [\.standardErrorContent]) {
+            let testStream = AsyncStream<String> { continuation in
+                continuation.yield("A")
+                continuation.finish()
+            }
+            
+            var iterator = testStream.makeAsyncIterator()
+            let _ = try await iterator.transform(with: { sequence in
+                return ""
+            }, readSequenceFactory: { iterator in
+                return AsyncSequenceReader(iterator) { await $0.next() }
+            })
+        }
+        #if DEBUG
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadSequence.swift:39: Precondition failed: A transform was requested, but the sequence was left in a state where the next value will never be read (fix: Use AnyReadableSequence(iterator) instead of calling `.transform` on `iterator` directly)")
+        #endif
+    }
 }
