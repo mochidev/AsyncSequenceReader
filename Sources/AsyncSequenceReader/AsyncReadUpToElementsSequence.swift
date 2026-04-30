@@ -8,10 +8,9 @@
 //
 
 extension AsyncIteratorProtocol {
-    
     /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, including the termination sequence.
     ///
-    /// If the termination sequence was not detected before the end of the stream, or the specified maximum, an error will be thrown.
+    /// If the termination sequence was not detected before the end of the stream, or more than the specified maximum elements are read, an error will be thrown.
     ///
     /// In this example, an asynchronous sequence of Characters represents a list of words.
     ///
@@ -42,7 +41,7 @@ extension AsyncIteratorProtocol {
     
     /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, including the termination sequence.
     ///
-    /// If the termination sequence was not detected before the end of the stream, or the specified maximum, an error will be thrown.
+    /// If the termination sequence was not detected before the end of the stream, or more than the specified maximum elements are read, an error will be thrown.
     ///
     /// In this example, an asynchronous sequence of Characters represents a list of words.
     ///
@@ -65,20 +64,20 @@ extension AsyncIteratorProtocol {
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: `AsyncSequenceReaderError.terminationNotFound` if a complete byte sequence could not be returned by the time the sequence ended.
     public mutating func collect(
-        upToIncluding termination: [Element],
+        upToIncluding termination: some Collection<Element>,
         throwsIfOver maximumBufferSize: Int
     ) async throws -> [Element]? where Element: Equatable {
-        precondition(!termination.isEmpty, "stopSequence must not be empty")
+        precondition(!termination.isEmpty, "termination must not be empty")
         var result = [Element]()
         
         while let next = try await _nextIsolated() {
             if result.count == maximumBufferSize {
-                throw AsyncSequenceReaderError.terminationNotFound(maximum: maximumBufferSize, actual: result.count)
+                throw AsyncSequenceReaderError.terminationNotFound(maximum: maximumBufferSize, actual: result.count + 1)
             }
             
             result.append(next)
             
-            if result.suffix(termination.count) == termination {
+            if result.suffix(termination.count).elementsEqual(termination) {
                 return result
             }
         }
@@ -90,7 +89,7 @@ extension AsyncIteratorProtocol {
     
     /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, excluding the termination sequence.
     ///
-    /// If the termination sequence was not detected before the end of the stream, or the specified maximum, an error will be thrown.
+    /// If the termination sequence was not detected before the end of the stream, or more than the specified maximum elements are read, an error will be thrown.
     ///
     /// In this example, an asynchronous sequence of Characters represents a list of words.
     ///
@@ -121,7 +120,7 @@ extension AsyncIteratorProtocol {
     
     /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, excluding the termination sequence.
     ///
-    /// If the termination sequence was not detected before the end of the stream, or the specified maximum, an error will be thrown.
+    /// If the termination sequence was not detected before the end of the stream, or more than the specified maximum elements are read, an error will be thrown.
     ///
     /// In this example, an asynchronous sequence of Characters represents a list of words.
     ///
@@ -144,15 +143,18 @@ extension AsyncIteratorProtocol {
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: `AsyncSequenceReaderError.terminationNotFound` if a complete byte sequence could not be returned by the time the sequence ended.
     public mutating func collect(
-        upToExcluding termination: [Element],
+        upToExcluding termination: some Collection<Element>,
         throwsIfOver maximumBufferSize: Int
     ) async throws -> [Element]? where Element: Equatable {
         try await collect(upToIncluding: termination, throwsIfOver: maximumBufferSize)?.dropLast(termination.count)
     }
+}
+
+extension AsyncIteratorProtocol {
     
     /// Collect elements into a sequence until the termination sequence is encountered, and transform it using the provided closure.
     ///
-    /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count) == termination`.
+    /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count).elementsEqual(termination)`.
     ///
     /// In this example, an asynchronous sequence of Characters represents a list of words.
     ///
@@ -182,14 +184,14 @@ extension AsyncIteratorProtocol {
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     public mutating func collect<Transformed>(
         upToIncluding termination: Element,
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self>) async -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws -> Transformed
     ) async throws -> Transformed? where Element: Equatable {
         try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
     }
     
     /// Collect elements into a sequence until the termination sequence is encountered, and transform it using the provided closure.
     ///
-    /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count) == termination`.
+    /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count).elementsEqual(termination)`.
     ///
     /// In this example, an asynchronous sequence of Characters represents a list of words.
     ///
@@ -217,83 +219,12 @@ extension AsyncIteratorProtocol {
     /// - Parameter termination: The sequence of elements marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
-    public mutating func collect<Transformed>(
-        upToIncluding termination: [Element],
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self>) async -> Transformed
-    ) async throws -> Transformed? where Element: Equatable {
-        try await transform(with: sequenceTransform) { .init($0, termination: termination) }
-    }
-    
-    /// Collect elements into a sequence until the termination sequence is encountered, and transform it using the provided closure.
-    ///
-    /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count) == termination`.
-    ///
-    /// In this example, an asynchronous sequence of Characters represents a list of words.
-    ///
-    /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
-    ///
-    ///     let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple"
-    ///
-    ///     let wordStream = dataStream.iteratorMap { iterator -> String? in
-    ///         let word = await iterator.collect(upToIncluding: " ") { sequence -> String in
-    ///             await sequence.reduce(into: "") { $0.append($1) }
-    ///         }
-    ///
-    ///         if let word = word, word.hasSuffix(" ") {
-    ///             return String(word.dropLast(1))
-    ///         }
-    ///
-    ///         return word
-    ///     }
-    ///
-    ///     for await word in wordStream {
-    ///         print("\"\(word)\"", terminator: ", ")
-    ///     }
-    ///     // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
-    ///
-    /// - Parameter termination: The element marking the end of the sequence the `sequenceTransform` closure will have access to.
-    /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
-    /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
-    public mutating func collect<Transformed>(
-        upToIncluding termination: Element,
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self>) async throws -> Transformed
-    ) async throws -> Transformed? where Element: Equatable {
-        try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
-    }
-    
-    /// Collect elements into a sequence until the termination sequence is encountered, and transform it using the provided closure.
-    ///
-    /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count) == termination`.
-    ///
-    /// In this example, an asynchronous sequence of Characters represents a list of words.
-    ///
-    /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
-    ///
-    ///     let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple"
-    ///
-    ///     let wordStream = dataStream.iteratorMap { iterator -> String? in
-    ///         let word = await iterator.collect(upToIncluding: [" "]) { sequence -> String in
-    ///             await sequence.reduce(into: "") { $0.append($1) }
-    ///         }
-    ///
-    ///         if let word = word, word.hasSuffix(" ") {
-    ///             return String(word.dropLast(1))
-    ///         }
-    ///
-    ///         return word
-    ///     }
-    ///
-    ///     for await word in wordStream {
-    ///         print("\"\(word)\"", terminator: ", ")
-    ///     }
-    ///     // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
-    ///
-    /// - Parameter termination: The sequence of elements marking the end of the sequence the `sequenceTransform` closure will have access to.
-    /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
-    /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
-    public mutating func collect<Transformed>(
-        upToIncluding termination: [Element],
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self>) async throws -> Transformed
+    public mutating func collect<
+        TerminationCollection: Collection<Element>,
+        Transformed
+    >(
+        upToIncluding termination: TerminationCollection,
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, TerminationCollection>) async throws -> Transformed
     ) async throws -> Transformed? where Element: Equatable {
         try await transform(with: sequenceTransform) { .init($0, termination: termination) }
     }
@@ -303,7 +234,7 @@ extension AsyncBufferedIterator {
     
     /// Collect elements into a sequence until the termination sequence is encountered, and transform it using the provided closure.
     ///
-    /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count) == termination`.
+    /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count).elementsEqual(termination)`.
     ///
     /// In this example, an asynchronous sequence of Characters represents a list of words.
     ///
@@ -333,14 +264,14 @@ extension AsyncBufferedIterator {
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     public mutating func collect<Transformed>(
         upToIncluding termination: Element,
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self>) async -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws -> Transformed
     ) async throws -> Transformed? where Element: Equatable {
         try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
     }
     
     /// Collect elements into a sequence until the termination sequence is encountered, and transform it using the provided closure.
     ///
-    /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count) == termination`.
+    /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count).elementsEqual(termination)`.
     ///
     /// In this example, an asynchronous sequence of Characters represents a list of words.
     ///
@@ -368,102 +299,34 @@ extension AsyncBufferedIterator {
     /// - Parameter termination: The sequence of elements marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
-    public mutating func collect<Transformed>(
-        upToIncluding termination: [Element],
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<BaseIterator>) async -> Transformed
-    ) async throws -> Transformed? where Element: Equatable {
-        try await transform(with: sequenceTransform) { .init($0, termination: termination) }
-    }
-    
-    /// Collect elements into a sequence until the termination sequence is encountered, and transform it using the provided closure.
-    ///
-    /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count) == termination`.
-    ///
-    /// In this example, an asynchronous sequence of Characters represents a list of words.
-    ///
-    /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
-    ///
-    ///     let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple"
-    ///
-    ///     let wordStream = dataStream.iteratorMap { iterator -> String? in
-    ///         let word = await iterator.collect(upToIncluding: " ") { sequence -> String in
-    ///             await sequence.reduce(into: "") { $0.append($1) }
-    ///         }
-    ///
-    ///         if let word = word, word.hasSuffix(" ") {
-    ///             return String(word.dropLast(1))
-    ///         }
-    ///
-    ///         return word
-    ///     }
-    ///
-    ///     for await word in wordStream {
-    ///         print("\"\(word)\"", terminator: ", ")
-    ///     }
-    ///     // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
-    ///
-    /// - Parameter termination: The element marking the end of the sequence the `sequenceTransform` closure will have access to.
-    /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
-    /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
-    public mutating func collect<Transformed>(
-        upToIncluding termination: Element,
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self>) async throws -> Transformed
-    ) async throws -> Transformed? where Element: Equatable {
-        try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
-    }
-    
-    /// Collect elements into a sequence until the termination sequence is encountered, and transform it using the provided closure.
-    ///
-    /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count) == termination`.
-    ///
-    /// In this example, an asynchronous sequence of Characters represents a list of words.
-    ///
-    /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
-    ///
-    ///     let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple"
-    ///
-    ///     let wordStream = dataStream.iteratorMap { iterator -> String? in
-    ///         let word = await iterator.collect(upToIncluding: [" "]) { sequence -> String in
-    ///             await sequence.reduce(into: "") { $0.append($1) }
-    ///         }
-    ///
-    ///         if let word = word, word.hasSuffix(" ") {
-    ///             return String(word.dropLast(1))
-    ///         }
-    ///
-    ///         return word
-    ///     }
-    ///
-    ///     for await word in wordStream {
-    ///         print("\"\(word)\"", terminator: ", ")
-    ///     }
-    ///     // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
-    ///
-    /// - Parameter termination: The sequence of elements marking the end of the sequence the `sequenceTransform` closure will have access to.
-    /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
-    /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
-    public mutating func collect<Transformed>(
-        upToIncluding termination: [Element],
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<BaseIterator>) async throws -> Transformed
+    public mutating func collect<
+        TerminationCollection: Collection<Element>,
+        Transformed
+    >(
+        upToIncluding termination: TerminationCollection,
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<BaseIterator, TerminationCollection>) async throws -> Transformed
     ) async throws -> Transformed? where Element: Equatable {
         try await transform(with: sequenceTransform) { .init($0, termination: termination) }
     }
 }
 
 /// An asynchronous sequence that will read from a mutable iterator so long as the specified conditions are valid.
-public class AsyncReadUpToElementsSequence<BaseIterator: AsyncIteratorProtocol>: AsyncReadSequence where BaseIterator.Element: Equatable {
+public class AsyncReadUpToElementsSequence<
+    BaseIterator: AsyncIteratorProtocol,
+    TerminationCollection: Collection
+>: AsyncReadSequence where TerminationCollection.Element == BaseIterator.Element, TerminationCollection.Element: Equatable {
     /// The baseIterator to read from.
     ///
     /// When finished with the sequence, callers should read back this value so they can continue iterating on the sequence.
     public var baseIterator: AsyncBufferedIterator<BaseIterator>
     
     @usableFromInline
-    let termination: [Element]
+    let termination: TerminationCollection
     
     @usableFromInline
     init(
         _ baseIterator: AsyncBufferedIterator<BaseIterator>,
-        termination: [Element]
+        termination: TerminationCollection
     ) {
         precondition(!termination.isEmpty, "termination must not be empty")
         self.baseIterator = baseIterator
@@ -497,7 +360,7 @@ extension AsyncReadUpToElementsSequence: AsyncSequence {
         @inlinable
         public mutating func next() async rethrows -> Element? {
             guard
-                bufferedSuffix != readSequence.termination,
+                !bufferedSuffix.elementsEqual(readSequence.termination),
                 let next = try await readSequence.baseIterator.next()
             else { return nil }
             
