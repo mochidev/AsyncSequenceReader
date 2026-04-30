@@ -10,6 +10,14 @@
 @testable import AsyncSequenceReader
 import Testing
 
+extension AsyncIteratorProtocol {
+    mutating func nonIsolatedNext() async rethrows -> Element? {
+        nonisolated(unsafe) var iterator = self
+        defer { self = iterator }
+        return try await iterator.next()
+    }
+}
+
 @Suite struct AsyncBufferedIteratorTests {
     @Test func bufferIteratorFromStream() async throws {
         let testStream = AsyncStream<Int> { continuation in
@@ -36,7 +44,7 @@ import Testing
         #expect(await bufferedIterator.hasMoreData() == true)
         #expect(await bufferedIterator.hasMoreData() == true)
         #expect(await bufferedIterator.next() == 5)
-        #expect(await bufferedIterator.next() == 6)
+        #expect(try await bufferedIterator.nonIsolatedNext() == 6)
         #expect(await bufferedIterator.next() == 7)
         #expect(await bufferedIterator.next() == 8)
         #expect(await bufferedIterator.hasMoreData() == true)
@@ -70,7 +78,7 @@ import Testing
         #expect(await bufferedIterator.hasMoreData() == true)
         #expect(await bufferedIterator.hasMoreData() == true)
         #expect(await bufferedIterator.next() == 5)
-        #expect(await bufferedIterator.next() == 6)
+        #expect(try await bufferedIterator.nonIsolatedNext() == 6)
         #expect(await bufferedIterator.next() == 7)
         #expect(await bufferedIterator.next() == 8)
         #expect(await bufferedIterator.hasMoreData() == true)
@@ -104,7 +112,7 @@ import Testing
         #expect(try await bufferedIterator.hasMoreData() == true)
         #expect(try await bufferedIterator.hasMoreData() == true)
         #expect(try await bufferedIterator.next() == 5)
-        #expect(try await bufferedIterator.next() == 6)
+        #expect(try await bufferedIterator.nonIsolatedNext() == 6)
         #expect(try await bufferedIterator.next() == 7)
         #expect(try await bufferedIterator.next() == 8)
         #expect(try await bufferedIterator.hasMoreData() == true)

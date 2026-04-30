@@ -15,7 +15,7 @@ extension AsyncIteratorProtocol {
     /// - Returns: A collection with exactly `count` elements, or `nil` if the sequence is finished.
     /// - Throws: `AsyncSequenceReaderError.insufficientElements` if a complete byte sequence could not be returned by the time the sequence ended.
     public mutating func collect(_ count: Int) async throws -> [Element]? {
-        assert(count >= 0, "count must be larger than 0")
+        assert(count >= 0, "count must be larger than or equal to 0")
         return try await collect(min: count, max: count)
     }
     
@@ -28,7 +28,9 @@ extension AsyncIteratorProtocol {
     /// - Throws: `AsyncSequenceReaderError.insufficientElements` if a complete byte sequence could not be returned by the time the sequence ended.
     public mutating func collect(min minCount: Int = 0, max maxCount: Int) async throws -> [Element]? {
         precondition(minCount <= maxCount, "maxCount must be larger than or equal to minCount")
-        precondition(minCount >= 0, "minCount must be larger than 0")
+        precondition(minCount >= 0, "minCount must be larger than or equal to 0")
+        if maxCount == 0 { return [] }
+        
         var result = [Element]()
         result.reserveCapacity(minCount)
         
@@ -82,7 +84,7 @@ extension AsyncIteratorProtocol {
         _ count: Int,
         sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self>) async throws -> Transformed
     ) async throws -> Transformed? {
-        assert(count >= 0, "count must be larger than 0")
+        assert(count >= 0, "count must be larger than or equal to 0")
         return try await collect(min: count, max: count, sequenceTransform: sequenceTransform)
     }
     
@@ -111,17 +113,22 @@ extension AsyncIteratorProtocol {
     ///     }
     ///     // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye?"
     ///
+    /// - Important: This variation reads ahead a single byte
+    ///
     /// - Parameter minCount: The minimum number of elements the `sequenceTransform` closure will attempt have access to. If this number cannot be guaranteed, an error will be thrown.
     /// - Parameter maxCount: The maximum number of elements the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     /// - Throws: `AsyncSequenceReaderError.insufficientElements` if a complete byte sequence could not be returned by the time the sequence ended.
     public mutating func collect<Transformed>(
-        min minCount: Int = 0,
+        min minCount: Int = 1,
         max maxCount: Int,
         sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self>) async throws -> Transformed
     ) async throws -> Transformed? {
-        try await transform(with: sequenceTransform) { .init($0, minCount: minCount, maxCount: maxCount) }
+        /// It is unsafe to read ahead in this case, so exit early if we know we won't need to read.
+        if maxCount == 0 { return nil }
+        assert(minCount >= 1, "minCount must be larger than or equal to 1, or the first value risks getting dropped")
+        return try await transform(with: sequenceTransform) { .init($0, minCount: minCount, maxCount: maxCount) }
     }
 }
 
@@ -222,7 +229,7 @@ public final class AsyncReadUpToCountSequence<BaseIterator: AsyncIteratorProtoco
         maxCount: Int
     ) {
         precondition(minCount <= maxCount, "maxCount must be larger than or equal to minCount")
-        precondition(minCount >= 0, "minCount must be larger than 0")
+        precondition(minCount >= 0, "minCount must be larger than or equal to 0")
         self.baseIterator = baseIterator
         self.minCount = minCount
         self.maxCount = maxCount

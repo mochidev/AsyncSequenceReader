@@ -8,6 +8,8 @@
 //
 
 /// A type-erased convenience type to normalize synchronous and asynchronous sequences into a common async type.
+///
+/// - Note: `AnyReadableSequence` supports being iterated multiple times _only_ if the underlying sequence supports being iterated multiple times.
 public struct AnyReadableSequence<Element>: AsyncSequence {
     @usableFromInline
     let makeUnderlyingIterator: @Sendable () -> @Sendable () async throws -> Element?

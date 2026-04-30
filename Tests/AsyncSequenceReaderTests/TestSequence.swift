@@ -12,7 +12,7 @@ import Foundation
 struct TestSequence<Base>: AsyncSequence where Base: Sequence {
     typealias Element = Base.Element
     
-    var base: Base
+    nonisolated(unsafe) var base: Base
     
     struct AsyncIterator: AsyncIteratorProtocol {
         var baseIterator: Base.Iterator
@@ -30,7 +30,7 @@ struct TestSequence<Base>: AsyncSequence where Base: Sequence {
 struct ThrowingTestSequence<Base>: AsyncSequence where Base: Sequence {
     typealias Element = Base.Element
     
-    var base: Base
+    nonisolated(unsafe) var base: Base
     
     struct AsyncIterator: AsyncIteratorProtocol {
         var baseIterator: Base.Iterator
