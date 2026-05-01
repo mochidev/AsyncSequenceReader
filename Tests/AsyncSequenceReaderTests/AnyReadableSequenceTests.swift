@@ -17,9 +17,20 @@ import Testing
         var iterator = sequence.makeAsyncIterator()
         
         #expect(await iterator.next() == 0)
-        #expect(await iterator.next() == 1)
+        #expect(await iterator.nonIsolatedNext() == 1)
         #expect(await iterator.next() == 2)
         #expect(await iterator.next() == nil)
+    }
+    
+    @Test func castThrowingSequence() async throws {
+        let sequence = AnyReadableSequence<_, any Error>([0, 1, 2])
+        
+        let iterator = sequence.makeAsyncIterator()
+        
+        #expect(try await iterator.next() == 0)
+        #expect(try await iterator.next() == 1)
+        #expect(try await iterator.next() == 2)
+        #expect(try await iterator.next() == nil)
     }
     
     @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
@@ -31,7 +42,7 @@ import Testing
             continuation.finish()
         })
         
-        var iterator = sequence.makeAsyncIterator()
+        let iterator = sequence.makeAsyncIterator()
         
         #expect(await iterator.next() == 0)
         #expect(await iterator.next() == 1)
@@ -39,11 +50,32 @@ import Testing
         #expect(await iterator.next() == nil)
     }
     
-    @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
     @Test func castThrowingAsyncSequence() async throws {
-        let sequence = AnyReadableSequence(ThrowingTestSequence(base: [0, 1, 2]))
+        let sequence = AnyReadableSequence(ThrowingTestSequence(base: [0, 1, 2]).map({
+            if $0 > 5 {
+                throw CancellationError()
+            }
+            return $0
+        }))
         
-        var iterator = sequence.makeAsyncIterator()
+        let iterator = sequence.makeAsyncIterator()
+        
+        #expect(try await iterator.next() == 0)
+        #expect(try await iterator.next() == 1)
+        #expect(try await iterator.next() == 2)
+        #expect(try await iterator.next() == nil)
+    }
+    
+    @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+    @Test func castModernThrowingAsyncSequence() async throws {
+        let sequence = AnyReadableSequence(ThrowingTestSequence(base: [0, 1, 2]).map({
+            if $0 > 5 {
+                throw CancellationError()
+            }
+            return $0
+        }))
+        
+        let iterator = sequence.makeAsyncIterator()
         
         #expect(try await iterator.next() == 0)
         #expect(try await iterator.next() == 1)
