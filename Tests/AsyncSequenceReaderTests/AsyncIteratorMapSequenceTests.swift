@@ -37,7 +37,7 @@ import Testing
         
         #expect(await resultsIterator.next() == "Hello, World!")
         #expect(await resultsIterator.next() == "My name is Dimitri.")
-        #expect(await resultsIterator.next() == "")
+        #expect(try await resultsIterator.nonIsolatedNext() == "")
         #expect(await resultsIterator.next() == "Bye!")
         #expect(await resultsIterator.next() == nil)
     }
@@ -151,6 +151,36 @@ import Testing
             }
             
             return results.joined(separator: " ")
+        }
+        
+        var resultsIterator = results.makeAsyncIterator()
+        
+        #expect(try await resultsIterator.next() == "Hello, World!")
+        #expect(try await resultsIterator.next() == "My name is Dimitri.")
+        #expect(try await resultsIterator.next() == "")
+        #expect(try await resultsIterator.next() == "Bye!")
+        #expect(try await resultsIterator.next() == nil)
+    }
+    
+    @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+    @Test func modernIteratorMapFromThrowingTestSequence() async throws {
+        let testStream = ThrowingTestSequence(base: ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"])
+        
+        let results = testStream.iteratorMap { (iterator) async throws(TestSequenceError) -> String? in
+            do {
+                var count = Int(try await iterator.next() ?? "")!
+                
+                var results: [String] = []
+                
+                while count > 0, let next = try await iterator.next() {
+                    results.append(next)
+                    count -= 1
+                }
+                
+                return results.joined(separator: " ")
+            } catch {
+                throw error as! TestSequenceError
+            }
         }
         
         var resultsIterator = results.makeAsyncIterator()
