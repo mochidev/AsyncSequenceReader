@@ -10,14 +10,6 @@
 @testable import AsyncSequenceReader
 import Testing
 
-extension AsyncIteratorProtocol {
-    mutating func nonIsolatedNext() async rethrows -> Element? {
-        nonisolated(unsafe) var iterator = self
-        defer { self = iterator }
-        return try await iterator.next()
-    }
-}
-
 @Suite struct AsyncBufferedIteratorTests {
     @Test func bufferIteratorFromStream() async throws {
         let testStream = AsyncStream<Int> { continuation in

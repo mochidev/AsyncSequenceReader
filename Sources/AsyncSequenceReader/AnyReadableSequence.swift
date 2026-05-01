@@ -24,9 +24,30 @@ public struct AnyReadableSequence<Element, Failure: Error>: AsyncSequence {
         }
         
         @inlinable
-        public mutating func next() async throws(Failure) -> Element? {
-            try await makeUnderlyingNext()
+        @_disfavoredOverload
+        public func next() async throws(Failure) -> Element? {
+            try await next()
         }
+        
+        @inlinable
+        public func next(isolation actor: isolated (any Actor)? = #isolation) async throws(Failure) -> Element? {
+            #if compiler(>=6.2)
+            try await makeUnderlyingNext()
+            #else
+            /// Swift 6.0 and Swift 6.1 require a bypass for `non-sendable result type 'Self.Element?' cannot be sent from nonisolated context in call to instance method 'next()'`
+            nonisolated(unsafe) let iterator = self
+            let value = try await iterator._nextSendable()
+            return value as! Element?
+            #endif
+        }
+        
+        #if compiler(<6.2)
+        /// Swift 6.0 and Swift 6.1 require a bypass for `non-sendable result type 'Self.Element?' cannot be sent from nonisolated context in call to instance method 'next()'`
+        @usableFromInline
+        func _nextSendable() async throws(Failure) -> sending Any {
+            try await makeUnderlyingNext() as Any
+        }
+        #endif
     }
     
     @inlinable
@@ -41,7 +62,16 @@ public struct AnyReadableSequence<Element, Failure: Error>: AsyncSequence {
     
     /// Initialize ``AnyReadableSequence`` with a sequence.
     @inlinable
-    @_disfavoredOverload
+    public init<S: Sequence & Sendable>(_ sequence: S) where S.Element == Element {
+        self.init {
+            nonisolated(unsafe) var iterator = sequence.makeIterator()
+            
+            return { iterator.next() }
+        }
+    }
+    
+    /// Initialize ``AnyReadableSequence`` with a sequence.
+    @inlinable
     public init<S: Sequence & Sendable>(_ sequence: S) where S.Element == Element, Failure == Never {
         self.init {
             nonisolated(unsafe) var iterator = sequence.makeIterator()
@@ -52,6 +82,7 @@ public struct AnyReadableSequence<Element, Failure: Error>: AsyncSequence {
     
     /// Initialize ``AnyReadableSequence`` with an async sequence.
     @inlinable
+    @_disfavoredOverload
     public init<S: AsyncSequence & Sendable>(_ sequence: S) where S.Element == Element, Failure == any Error {
         self.init {
             nonisolated(unsafe) var iterator = sequence.makeAsyncIterator()
