@@ -27,16 +27,17 @@ struct TestSequence<Base>: AsyncSequence where Base: Sequence {
     }
 }
 
+struct TestSequenceError: Error {}
+
 struct ThrowingTestSequence<Base>: AsyncSequence where Base: Sequence {
     typealias Element = Base.Element
-    struct LocalError: Error {}
     
     nonisolated(unsafe) var base: Base
     
     struct AsyncIterator: AsyncIteratorProtocol {
         var baseIterator: Base.Iterator
         
-        mutating func next() async throws(LocalError) -> Base.Iterator.Element? {
+        mutating func next() async throws(TestSequenceError) -> Base.Iterator.Element? {
             baseIterator.next()
         }
     }
