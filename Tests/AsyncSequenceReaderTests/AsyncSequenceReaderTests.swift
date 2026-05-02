@@ -232,7 +232,7 @@ import Testing
         }
         
         var iterator = AsyncBufferedIterator(testStream.makeAsyncIterator())
-        #expect(try await iterator.transform(with: { sequence in
+        #expect(await iterator.transform(with: { sequence in
             Issue.record("Transformation should never be called!")
         }, readSequenceFactory: { iterator in
             Issue.record("Factory should never be called!")
@@ -244,7 +244,7 @@ import Testing
         let testStream = TestSequence(base: [])
         
         var iterator = testStream.makeAsyncIterator()
-        #expect(try await iterator.transform(with: { sequence in
+        #expect(await iterator.transform(with: { sequence in
             Issue.record("Transformation should never be called!")
         }, readSequenceFactory: { iterator in
             Issue.record("Factory should never be called!")
@@ -258,7 +258,7 @@ import Testing
         }
         
         var iterator = testStream.makeAsyncIterator()
-        #expect(try await iterator.transform(with: { sequence in
+        #expect(await iterator.transform(with: { sequence in
             Issue.record("Transformation should never be called!")
         }, readSequenceFactory: { iterator in
             Issue.record("Factory should never be called!")
@@ -273,7 +273,7 @@ import Testing
         }
         
         var iterator = AsyncBufferedIterator(testStream.makeAsyncIterator())
-        let result = try await iterator.transform(with: { sequence in
+        let result = await iterator.transform(with: { sequence in
             return ""
         }, readSequenceFactory: { iterator in
             AsyncSequenceReader(iterator) { await $0.next() }
@@ -287,14 +287,14 @@ import Testing
             let testStream = TestSequence(base: ["A"])
             
             var iterator = testStream.makeAsyncIterator()
-            let _ = try await iterator.transform(with: { sequence in
+            let _ = await iterator.transform(with: { sequence in
                 return ""
             }, readSequenceFactory: { iterator in
                 AsyncSequenceReader(iterator) { await $0.next() }
             })
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadSequence.swift:39: Precondition failed: A transform was requested, but the sequence was left in a state where the next value will never be read (fix: Use AnyReadableSequence(iterator) instead of calling `.transform` on `iterator` directly)")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadSequence.swift:42: Precondition failed: A transform was requested, but the sequence was left in a state where the next value will never be read (fix: Use AnyReadableSequence(iterator) instead of calling `.transform` on `iterator` directly)")
         #endif
     }
     
@@ -306,14 +306,14 @@ import Testing
             }
             
             var iterator = testStream.makeAsyncIterator()
-            let _ = try await iterator.transform(with: { sequence in
+            let _ = await iterator.transform(with: { sequence in
                 return ""
             }, readSequenceFactory: { iterator in
                 return AsyncSequenceReader(iterator) { await $0.next() }
             })
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadSequence.swift:39: Precondition failed: A transform was requested, but the sequence was left in a state where the next value will never be read (fix: Use AnyReadableSequence(iterator) instead of calling `.transform` on `iterator` directly)")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadSequence.swift:42: Precondition failed: A transform was requested, but the sequence was left in a state where the next value will never be read (fix: Use AnyReadableSequence(iterator) instead of calling `.transform` on `iterator` directly)")
         #endif
     }
 }

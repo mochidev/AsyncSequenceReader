@@ -25,10 +25,13 @@ extension AsyncIteratorProtocol {
     /// - Parameter sequenceTransform: A transformation that accepts a sequence that can be read from, or stopped prematurely by returning `nil`. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Parameter readSequenceFactory: A factory to create a suitable ``AsyncReadSequence`` that will determine the logical bounds of the transformation within the receiving iterator.
     /// - Returns: A transformed value read from the iterator, or `nil` if there were no values left to read.
-    public mutating func transform<Transformed, ReadSequence: AsyncReadSequence>(
-        with sequenceTransform: sending (sending ReadSequence) async throws -> Transformed,
+    public mutating func transform<
+        Transformed, ReadSequence: AsyncReadSequence,
+        TransformFailure: Error
+    >(
+        with sequenceTransform: sending (sending ReadSequence) async throws(TransformFailure) -> Transformed,
         readSequenceFactory: (inout AsyncBufferedIterator<Self>) -> ReadSequence
-    ) async throws -> Transformed? where ReadSequence.BaseIterator == Self {
+    ) async throws(TransformFailure) -> Transformed? where ReadSequence.BaseIterator == Self {
         var results: Transformed? = nil
         var wrappedIterator = AsyncBufferedIterator(self)
         if await wrappedIterator.hasMoreData() {
@@ -51,10 +54,13 @@ extension AsyncBufferedIterator {
     /// - Parameter sequenceTransform: A transformation that accepts a sequence that can be read from, or stopped prematurely by returning `nil`. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Parameter readSequenceFactory: A factory to create a suitable ``AsyncReadSequence`` that will determine the logical bounds of the transformation within the receiving iterator.
     /// - Returns: A transformed value read from the iterator, or `nil` if there were no values left to read.
-    public mutating func transform<Transformed, ReadSequence: AsyncReadSequence>(
-        with sequenceTransform: sending (sending ReadSequence) async throws -> Transformed,
+    public mutating func transform<
+        Transformed, ReadSequence: AsyncReadSequence,
+        TransformFailure: Error
+    >(
+        with sequenceTransform: sending (sending ReadSequence) async throws(TransformFailure) -> Transformed,
         readSequenceFactory: (inout Self) -> ReadSequence
-    ) async throws -> Transformed? where ReadSequence.BaseIterator == BaseIterator {
+    ) async throws(TransformFailure) -> Transformed? where ReadSequence.BaseIterator == BaseIterator {
         var results: Transformed? = nil
         if await self.hasMoreData() {
             nonisolated(unsafe) let readSequence = readSequenceFactory(&self)
