@@ -234,8 +234,7 @@ extension AsyncIteratorProtocol {
     }
 }
 
-extension AsyncBufferedIterator {
-    
+extension AsyncBufferedIterator where Element: Equatable {
     /// Collect elements into a sequence until the termination sequence is encountered, and transform it using the provided closure.
     ///
     /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count).elementsEqual(termination)`.
@@ -269,7 +268,7 @@ extension AsyncBufferedIterator {
     public mutating func collect<Transformed>(
         upToIncluding termination: Element,
         sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws -> Transformed
-    ) async rethrows -> Transformed? where Element: Equatable {
+    ) async rethrows -> Transformed? {
         try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
     }
     
@@ -309,7 +308,7 @@ extension AsyncBufferedIterator {
     >(
         upToIncluding termination: TerminationCollection,
         sequenceTransform: sending (AsyncReadUpToElementsSequence<BaseIterator, TerminationCollection>) async throws -> Transformed
-    ) async rethrows -> Transformed? where Element: Equatable {
+    ) async rethrows -> Transformed? {
         try await transform(with: sequenceTransform) { .init($0, termination: termination) }
     }
 }
