@@ -22,8 +22,8 @@ public class AsyncSequenceReader<BaseIterator: AsyncIteratorProtocol>: AsyncRead
     @usableFromInline
     let read: (_ iterator: inout AsyncBufferedIterator<BaseIterator>) async throws -> Element?
     
-    @usableFromInline
-    init(
+    @inlinable
+    public init(
         _ baseIterator: AsyncBufferedIterator<BaseIterator>,
         read: @escaping (_ iterator: inout AsyncBufferedIterator<BaseIterator>) async throws -> Element?
     ) {
