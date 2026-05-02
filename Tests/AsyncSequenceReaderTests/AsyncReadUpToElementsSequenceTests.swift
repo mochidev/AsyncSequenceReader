@@ -338,87 +338,87 @@ import Testing
         let inputSequence = "apple, orange, banana, kiwi, kumquat, pear, pineapple"
         
         let results = inputSequence.iteratorMap { iterator -> String? in
-            try await iterator.collect(upToIncluding: ", ") { sequence -> String in
+            await iterator.collect(upToIncluding: ", ") { sequence -> String in
                 await sequence.reduce(into: "") { $0.append($1) }
             }
         }
         
         var resultsIterator = results.makeAsyncIterator()
         
-        #expect(try await resultsIterator.next() == "apple, ")
-        #expect(try await resultsIterator.next() == "orange, ")
-        #expect(try await resultsIterator.next() == "banana, ")
-        #expect(try await resultsIterator.next() == "kiwi, ")
-        #expect(try await resultsIterator.next() == "kumquat, ")
-        #expect(try await resultsIterator.next() == "pear, ")
-        #expect(try await resultsIterator.next() == "pineapple")
-        #expect(try await resultsIterator.next() == nil)
+        #expect(await resultsIterator.next() == "apple, ")
+        #expect(await resultsIterator.next() == "orange, ")
+        #expect(await resultsIterator.next() == "banana, ")
+        #expect(await resultsIterator.next() == "kiwi, ")
+        #expect(await resultsIterator.next() == "kumquat, ")
+        #expect(await resultsIterator.next() == "pear, ")
+        #expect(await resultsIterator.next() == "pineapple")
+        #expect(await resultsIterator.next() == nil)
     }
     
     @Test func trapsIfBufferedIteratorTransformingUpToIncludingTerminationIsEmpty() async throws {
         let result = await #expect(processExitsWith: .failure, observing: [\.standardErrorContent]) {
             var inputSequence = AsyncBufferedIterator(AnyReadableSequence(" ").makeAsyncIterator())
-            let _ = try await inputSequence.collect(upToIncluding: "") { sequence -> String in
+            let _ = await inputSequence.collect(upToIncluding: "") { sequence -> String in
                 await sequence.reduce(into: "") { $0.append($1) }
             }
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToElementsSequence.swift:331: Precondition failed: termination must not be empty")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToElementsSequence.swift:335: Precondition failed: termination must not be empty")
         #endif
     }
     
     @Test func rawIteratorTransformingUpToIncluding() async throws {
         var iterator = AnyReadableSequence("apple orange banana kiwi kumquat pear pineapple").makeAsyncIterator()
-        #expect(try await iterator.collect(upToIncluding: " " as Character) { sequence in
+        #expect(await iterator.collect(upToIncluding: " " as Character) { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "apple ")
-        #expect(try await iterator.collect(upToIncluding: " " as Character) { sequence in
+        #expect(await iterator.collect(upToIncluding: " " as Character) { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "orange ")
-        #expect(try await iterator.collect(upToIncluding: " " as Character) { sequence in
+        #expect(await iterator.collect(upToIncluding: " " as Character) { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "banana ")
-        #expect(try await iterator.collect(upToIncluding: " " as Character) { sequence in
+        #expect(await iterator.collect(upToIncluding: " " as Character) { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "kiwi ")
-        #expect(try await iterator.collect(upToIncluding: " " as Character) { sequence in
+        #expect(await iterator.collect(upToIncluding: " " as Character) { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "kumquat ")
-        #expect(try await iterator.collect(upToIncluding: " " as Character) { sequence in
+        #expect(await iterator.collect(upToIncluding: " " as Character) { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "pear ")
-        #expect(try await iterator.collect(upToIncluding: " " as Character) { sequence in
+        #expect(await iterator.collect(upToIncluding: " " as Character) { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "pineapple")
-        #expect(try await iterator.collect(upToIncluding: " " as Character) { sequence in
+        #expect(await iterator.collect(upToIncluding: " " as Character) { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == nil)
     }
     
     @Test func rawIteratorTransformingUpToIncludingSequence() async throws {
         var iterator = AnyReadableSequence("apple, orange, banana, kiwi, kumquat, pear, pineapple").makeAsyncIterator()
-        #expect(try await iterator.collect(upToIncluding: ", ") { sequence in
+        #expect(await iterator.collect(upToIncluding: ", ") { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "apple, ")
-        #expect(try await iterator.collect(upToIncluding: ", ") { sequence in
+        #expect(await iterator.collect(upToIncluding: ", ") { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "orange, ")
-        #expect(try await iterator.collect(upToIncluding: ", ") { sequence in
+        #expect(await iterator.collect(upToIncluding: ", ") { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "banana, ")
-        #expect(try await iterator.collect(upToIncluding: ", ") { sequence in
+        #expect(await iterator.collect(upToIncluding: ", ") { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "kiwi, ")
-        #expect(try await iterator.collect(upToIncluding: ", ") { sequence in
+        #expect(await iterator.collect(upToIncluding: ", ") { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "kumquat, ")
-        #expect(try await iterator.collect(upToIncluding: ", ") { sequence in
+        #expect(await iterator.collect(upToIncluding: ", ") { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "pear, ")
-        #expect(try await iterator.collect(upToIncluding: ", ") { sequence in
+        #expect(await iterator.collect(upToIncluding: ", ") { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == "pineapple")
-        #expect(try await iterator.collect(upToIncluding: ", ") { sequence in
+        #expect(await iterator.collect(upToIncluding: ", ") { sequence in
             await sequence.reduce(into: "") { $0.append($1) }
         } == nil)
     }
@@ -426,12 +426,12 @@ import Testing
     @Test func trapsIfTransformingUpToIncludingTerminationIsEmpty() async throws {
         let result = await #expect(processExitsWith: .failure, observing: [\.standardErrorContent]) {
             var inputSequence = AnyReadableSequence(" ").makeAsyncIterator()
-            let _ = try await inputSequence.collect(upToIncluding: "") { sequence -> String in
+            let _ = await inputSequence.collect(upToIncluding: "") { sequence -> String in
                 await sequence.reduce(into: "") { $0.append($1) }
             }
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToElementsSequence.swift:331: Precondition failed: termination must not be empty")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToElementsSequence.swift:335: Precondition failed: termination must not be empty")
         #endif
     }
 }
