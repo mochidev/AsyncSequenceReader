@@ -16,7 +16,7 @@ public struct AsyncBufferedIterator<BaseIterator: AsyncIteratorProtocol>: AsyncI
     ///
     /// - Note:Ideally, this should be implemented using some sort of cyclical buffer like a Deque, but in practice, it will only ever have one entry.
     @usableFromInline
-    var unconsumedBuffer: [BaseIterator.Element] = []
+    var unconsumedBuffer: [Result<BaseIterator.Element, any Error>] = []
     
     @usableFromInline
     init(_ baseIterator: BaseIterator) {
@@ -32,7 +32,7 @@ public struct AsyncBufferedIterator<BaseIterator: AsyncIteratorProtocol>: AsyncI
     @inlinable
     public mutating func next(isolation actor: isolated (any Actor)? = #isolation) async rethrows -> BaseIterator.Element? {
         guard unconsumedBuffer.isEmpty else {
-            return unconsumedBuffer.removeFirst()
+            return try unconsumedBuffer.removeFirst().get()
         }
         
         return try await baseIterator._nextIsolated()
@@ -41,13 +41,24 @@ public struct AsyncBufferedIterator<BaseIterator: AsyncIteratorProtocol>: AsyncI
     /// Read ahead, and store the value for later, or throw if the base iterator also throws.
     /// - Returns: The read-ahead value.
     @usableFromInline
-    mutating func nextUnconsumed(isolation actor: isolated (any Actor)? = #isolation) async rethrows -> BaseIterator.Element? {
-        let next = try await baseIterator._nextIsolated()
-        if let value = next {
-            unconsumedBuffer.append(value)
+    mutating func nextUnconsumed(isolation actor: isolated (any Actor)? = #isolation) async -> Result<BaseIterator.Element, any Error>? {
+        /// Prevent a compiler crash catching a re-throwing result by casting it first.
+        func _preventCompilerCrashCacthingError(_ actor: isolated (any Actor)? = #isolation) async throws -> Element? {
+            try await baseIterator._nextIsolated()
         }
         
-        return next
+        do {
+            let next = try await _preventCompilerCrashCacthingError()
+            if let value = next {
+                unconsumedBuffer.append(.success(value))
+                return .success(value)
+            }
+            
+            return nil
+        } catch {
+            unconsumedBuffer.append(.failure(error))
+            return .failure(error)
+        }
     }
     
     /// Returns if the iterator has more elements to consume.
@@ -55,12 +66,12 @@ public struct AsyncBufferedIterator<BaseIterator: AsyncIteratorProtocol>: AsyncI
     /// If it does, the iterator saves the elements, and will deliver them immediately on the next call to `next()`
     /// - Returns: A Bool indicating if there is more to consume or not.
     @inlinable
-    public mutating func hasMoreData(isolation actor: isolated (any Actor)? = #isolation) async rethrows -> Bool {
+    public mutating func hasMoreData(isolation actor: isolated (any Actor)? = #isolation) async -> Bool {
         guard unconsumedBuffer.isEmpty else {
             return true
         }
         
-        return try await nextUnconsumed() != nil
+        return await nextUnconsumed() != nil
     }
 }
 

@@ -31,7 +31,7 @@ extension AsyncIteratorProtocol {
     ) async throws -> Transformed? where ReadSequence.BaseIterator == Self {
         var results: Transformed? = nil
         var wrappedIterator = AsyncBufferedIterator(self)
-        if try await wrappedIterator.hasMoreData() {
+        if await wrappedIterator.hasMoreData() {
             nonisolated(unsafe) let readSequence = readSequenceFactory(&wrappedIterator)
             results = try await sequenceTransform(readSequence)
             wrappedIterator = readSequence.baseIterator
@@ -56,7 +56,7 @@ extension AsyncBufferedIterator {
         readSequenceFactory: (inout Self) -> ReadSequence
     ) async throws -> Transformed? where ReadSequence.BaseIterator == BaseIterator {
         var results: Transformed? = nil
-        if try await self.hasMoreData() {
+        if await self.hasMoreData() {
             nonisolated(unsafe) let readSequence = readSequenceFactory(&self)
             results = try await sequenceTransform(readSequence)
             self = readSequence.baseIterator

@@ -196,7 +196,7 @@ extension AsyncIteratorMapSequence: AsyncSequence {
         /// This iterator calls `next()` on its (wrapped) base iterator, and stores the result; if this call returns `nil`, `next()` returns `nil`. Otherwise, `next()` returns the result of calling the transforming closure on the received element. If calling the transformation throws an error, the sequence ends and `next()` rethrows the error.
         @inlinable
         public mutating func next(isolation actor: isolated (any Actor)? = #isolation) async throws -> Transformed? {
-            guard !encounteredError, try await baseIterator.hasMoreData(isolation: actor) else {
+            guard !encounteredError, await baseIterator.hasMoreData(isolation: actor) else {
                 return nil
             }
             do {
@@ -220,7 +220,7 @@ extension AsyncIteratorMapSequence: AsyncSequence {
         /// This iterator calls `next()` on its (wrapped) base iterator, and stores the result; if this call returns `nil`, `next()` returns `nil`. Otherwise, `next()` returns the result of calling the transforming closure on the received element.
         @inlinable
         public mutating func next(isolation actor: isolated (any Actor)? = #isolation) async rethrows -> Transformed? where TransformFailure == Never {
-            guard try await baseIterator.hasMoreData(isolation: actor) else {
+            guard await baseIterator.hasMoreData(isolation: actor) else {
                 return nil
             }
             #if compiler(>=6.2)
