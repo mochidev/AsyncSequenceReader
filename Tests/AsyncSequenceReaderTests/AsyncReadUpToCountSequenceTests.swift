@@ -292,7 +292,11 @@ import Testing
             _ = try await iterator.collect(-1)
         }
         #if DEBUG
+        #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
         #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:18: Assertion failed: count must be larger than or equal to 0")
+        #else
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:64: Assertion failed: count must be larger than or equal to 0")
+        #endif
         #endif
     }
     
@@ -332,7 +336,11 @@ import Testing
             _ = try await iterator.collect(min: -1, max: 1)
         }
         #if DEBUG
+        #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
         #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:31: Precondition failed: minCount must be larger than or equal to 0")
+        #else
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:77: Precondition failed: minCount must be larger than or equal to 0")
+        #endif
         #endif
     }
     
@@ -358,7 +366,11 @@ import Testing
             _ = try await iterator.collect(min: -1, max: -1)
         }
         #if DEBUG
+        #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
         #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:31: Precondition failed: minCount must be larger than or equal to 0")
+        #else
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:77: Precondition failed: minCount must be larger than or equal to 0")
+        #endif
         #endif
     }
     
@@ -384,7 +396,11 @@ import Testing
             _ = try await iterator.collect(min: 0, max: -1)
         }
         #if DEBUG
+        #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
         #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:30: Precondition failed: maxCount must be larger than or equal to minCount")
+        #else
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:76: Precondition failed: maxCount must be larger than or equal to minCount")
+        #endif
         #endif
     }
     
