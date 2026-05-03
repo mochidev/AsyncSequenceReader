@@ -72,7 +72,7 @@ var limitedSequence = try await iterator.collect(min: 128, max: 256) // Array of
 
 For that last example, do note that the `limitedSequence` will only become available if and when all the bytes have been read. ie. you will not get results back if only 128 bytes are available _right now_, if the sequence is still ongoing.
 
-If the minimum number of bytes cannot be collected, an `AsyncSequenceReaderError.insufficientElements` error will be thrown.
+If the minimum number of bytes cannot be collected, an ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` error will be thrown.
 
 You can also collect elements into another async sequence using a **sequence transform**:
 
@@ -104,7 +104,7 @@ var httpHeaderEntry = try await iterator.collect(upToExcluding: ["\r".asciiValue
 
 This is especially useful when scanning for strings or other known boundaries, allowing you get get an array of elements either including or excluding the terminator you specified.
 
-Note how a ``throwsIfOver`` parameter is necessary — this is to prevent un-bounded reads from running out of control. If the terminator is not detected, or your maximum element allowance has been reached, an ``AsyncSequenceReaderError/terminationNotFound`` error will be thrown.
+Note how a `throwsIfOver` parameter is necessary — this is to prevent un-bounded reads from running out of control. If the terminator is not detected, or your maximum element allowance has been reached, an ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` error will be thrown.
 
 You can bypass the `throwsIfOver` parameter if you use a **sequence transform** instead, which may be a better option if your algorithm deals with large amounts of data. If you stop reading early, elements can still be read by subsequent requests, giving you more control over how to read your data.
 
