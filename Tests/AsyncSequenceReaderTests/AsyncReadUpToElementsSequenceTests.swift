@@ -158,7 +158,11 @@ import Testing
             let _ = try await inputSequence.collect(upToIncluding: "", throwsIfOver: 10)
         }
         #if DEBUG
+        #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
         #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToElementsSequence.swift:74: Precondition failed: termination must not be empty")
+        #else
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToElementsSequence.swift:226: Precondition failed: termination must not be empty")
+        #endif
         #endif
     }
     
@@ -309,7 +313,11 @@ import Testing
             let _ = try await inputSequence.collect(upToExcluding: "", throwsIfOver: 10)
         }
         #if DEBUG
+        #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
         #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToElementsSequence.swift:74: Precondition failed: termination must not be empty")
+        #else
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToElementsSequence.swift:226: Precondition failed: termination must not be empty")
+        #endif
         #endif
     }
     
