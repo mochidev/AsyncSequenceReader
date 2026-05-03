@@ -52,6 +52,52 @@ extension AsyncIteratorProtocol {
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+extension AsyncIteratorProtocol where Failure == Never {
+    /// Asynchronously advances by the specified number of elements, or ends the sequence if there is no next element.
+    ///
+    /// If a complete array could not be collected, an error is thrown and the sequence should be considered finished.
+    /// - Parameter count: The number of elements to collect.
+    /// - Returns: A collection with exactly `count` elements, or `nil` if the sequence is finished.
+    /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    public mutating func collect(_ count: Int) async throws(AsyncSequenceReaderError) -> [Element]? {
+        assert(count >= 0, "count must be larger than or equal to 0")
+        return try await collect(min: count, max: count)
+    }
+    
+    /// Asynchronously advances by the specified minimum number of elements, continuing until the specified maximum number of elements, or ends the sequence if there is no next element.
+    ///
+    /// If a complete array larger than `minCount` could not be constructed, an error is thrown and the sequence should be considered finished.
+    /// - Parameter minCount: The minimum number of elements to collect.
+    /// - Parameter maxCount: The maximum number of elements to collect.
+    /// - Returns: A collection with at least `minCount` and at most `maxCount` elements, or `nil` if the sequence is finished.
+    /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    public mutating func collect(min minCount: Int = 0, max maxCount: Int) async throws(AsyncSequenceReaderError) -> [Element]? {
+        precondition(minCount <= maxCount, "maxCount must be larger than or equal to minCount")
+        precondition(minCount >= 0, "minCount must be larger than or equal to 0")
+        if maxCount == 0 { return [] }
+        
+        var result = [Element]()
+        result.reserveCapacity(minCount)
+        
+        while let next = await _nextIsolated() {
+            result.append(next)
+            
+            if result.count == maxCount {
+                return result
+            }
+        }
+        
+        guard !result.isEmpty else { return nil }
+        
+        guard result.count >= minCount else {
+            throw AsyncSequenceReaderError.insufficientElements(minimum: minCount, actual: result.count)
+        }
+        
+        return result
+    }
+}
+
 extension AsyncIteratorProtocol {
     /// Collect the specified number of elements into a sequence, and transform it using the provided closure.
     ///

@@ -158,6 +158,158 @@ extension AsyncIteratorProtocol {
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+extension AsyncIteratorProtocol where Failure == Never {
+    /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, including the termination sequence.
+    ///
+    /// If the termination sequence was not detected before the end of the stream, or more than the specified maximum elements are read, an error will be thrown.
+    ///
+    /// In this example, an asynchronous sequence of Characters represents a list of words.
+    ///
+    /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
+    ///
+    /// ```swift
+    /// let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple "
+    ///
+    /// let wordStream = dataStream.iteratorMap { iterator -> String? in
+    ///     (try await iterator.collect(upToIncluding: " ", throwsIfOver: 100))
+    ///         .map { String($0.dropLast()) }
+    /// }
+    ///
+    /// for await word in wordStream {
+    ///     print("\"\(word)\"", terminator: ", ")
+    /// }
+    /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// ```
+    ///
+    /// - Parameter termination: The element marking the end of the sequence that will be collected.
+    /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
+    /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
+    /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    public mutating func collect(
+        upToIncluding termination: Element,
+        throwsIfOver maximumBufferSize: Int
+    ) async throws(AsyncSequenceReaderError) -> [Element]? where Element: Equatable {
+        try await collect(upToIncluding: [termination], throwsIfOver: maximumBufferSize)
+    }
+    
+    /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, including the termination sequence.
+    ///
+    /// If the termination sequence was not detected before the end of the stream, or more than the specified maximum elements are read, an error will be thrown.
+    ///
+    /// In this example, an asynchronous sequence of Characters represents a list of words.
+    ///
+    /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
+    ///
+    /// ```swift
+    /// let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple "
+    ///
+    /// let wordStream = dataStream.iteratorMap { iterator -> String? in
+    ///     (try await iterator.collect(upToIncluding: [" "], throwsIfOver: 100))
+    ///         .map { String($0.dropLast()) }
+    /// }
+    ///
+    /// for await word in wordStream {
+    ///     print("\"\(word)\"", terminator: ", ")
+    /// }
+    /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// ```
+    ///
+    /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
+    /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
+    /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
+    /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    public mutating func collect(
+        upToIncluding termination: some Collection<Element>,
+        throwsIfOver maximumBufferSize: Int
+    ) async throws(AsyncSequenceReaderError) -> [Element]? where Element: Equatable {
+        precondition(!termination.isEmpty, "termination must not be empty")
+        var result = [Element]()
+        
+        while let next = await _nextIsolated() {
+            if result.count == maximumBufferSize {
+                throw AsyncSequenceReaderError.terminationNotFound(maximum: maximumBufferSize, actual: result.count + 1)
+            }
+            
+            result.append(next)
+            
+            if result.suffix(termination.count).elementsEqual(termination) {
+                return result
+            }
+        }
+        
+        guard !result.isEmpty else { return nil }
+        
+        throw AsyncSequenceReaderError.terminationNotFound(maximum: maximumBufferSize, actual: result.count)
+    }
+    
+    /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, excluding the termination sequence.
+    ///
+    /// If the termination sequence was not detected before the end of the stream, or more than the specified maximum elements are read, an error will be thrown.
+    ///
+    /// In this example, an asynchronous sequence of Characters represents a list of words.
+    ///
+    /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
+    ///
+    /// ```swift
+    /// let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple "
+    ///
+    /// let wordStream = dataStream.iteratorMap { iterator -> String? in
+    ///     (try await iterator.collect(upToExcluding: " ", throwsIfOver: 100))
+    ///         .map { String($0) }
+    /// }
+    ///
+    /// for await word in wordStream {
+    ///     print("\"\(word)\"", terminator: ", ")
+    /// }
+    /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// ```
+    ///
+    /// - Parameter termination: The element marking the end of the sequence that will be collected.
+    /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
+    /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
+    /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    public mutating func collect(
+        upToExcluding termination: Element,
+        throwsIfOver maximumBufferSize: Int
+    ) async throws(AsyncSequenceReaderError) -> [Element]? where Element: Equatable {
+        try await collect(upToExcluding: [termination], throwsIfOver: maximumBufferSize)
+    }
+    
+    /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, excluding the termination sequence.
+    ///
+    /// If the termination sequence was not detected before the end of the stream, or more than the specified maximum elements are read, an error will be thrown.
+    ///
+    /// In this example, an asynchronous sequence of Characters represents a list of words.
+    ///
+    /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
+    ///
+    /// ```swift
+    /// let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple "
+    ///
+    /// let wordStream = dataStream.iteratorMap { iterator -> String? in
+    ///     (try await iterator.collect(upToExcluding: [" "], throwsIfOver: 100))
+    ///         .map { String($0) }
+    /// }
+    ///
+    /// for await word in wordStream {
+    ///     print("\"\(word)\"", terminator: ", ")
+    /// }
+    /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// ```
+    ///
+    /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
+    /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
+    /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
+    /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    public mutating func collect(
+        upToExcluding termination: some Collection<Element>,
+        throwsIfOver maximumBufferSize: Int
+    ) async throws(AsyncSequenceReaderError) -> [Element]? where Element: Equatable {
+        try await collect(upToIncluding: termination, throwsIfOver: maximumBufferSize)?.dropLast(termination.count)
+    }
+}
+
 extension AsyncIteratorProtocol {
     
     /// Collect elements into a sequence until the termination sequence is encountered, and transform it using the provided closure.

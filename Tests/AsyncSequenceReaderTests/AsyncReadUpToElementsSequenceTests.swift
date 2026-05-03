@@ -363,7 +363,7 @@ import Testing
             }
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToElementsSequence.swift:350: Precondition failed: termination must not be empty")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToElementsSequence.swift:502: Precondition failed: termination must not be empty")
         #endif
     }
     
@@ -431,7 +431,7 @@ import Testing
             }
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToElementsSequence.swift:350: Precondition failed: termination must not be empty")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToElementsSequence.swift:502: Precondition failed: termination must not be empty")
         #endif
     }
 }
