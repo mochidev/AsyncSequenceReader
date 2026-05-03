@@ -33,7 +33,7 @@ extension AsyncIteratorProtocol {
     /// - Parameter termination: The element marking the end of the sequence that will be collected.
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
-    /// - Throws: `AsyncSequenceReaderError.terminationNotFound` if a complete byte sequence could not be returned by the time the sequence ended.
+    /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     public mutating func collect(
         upToIncluding termination: Element,
         throwsIfOver maximumBufferSize: Int
@@ -66,7 +66,7 @@ extension AsyncIteratorProtocol {
     /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
-    /// - Throws: `AsyncSequenceReaderError.terminationNotFound` if a complete byte sequence could not be returned by the time the sequence ended.
+    /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     public mutating func collect(
         upToIncluding termination: some Collection<Element>,
         throwsIfOver maximumBufferSize: Int
@@ -116,7 +116,7 @@ extension AsyncIteratorProtocol {
     /// - Parameter termination: The element marking the end of the sequence that will be collected.
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
-    /// - Throws: `AsyncSequenceReaderError.terminationNotFound` if a complete byte sequence could not be returned by the time the sequence ended.
+    /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     public mutating func collect(
         upToExcluding termination: Element,
         throwsIfOver maximumBufferSize: Int
@@ -149,7 +149,7 @@ extension AsyncIteratorProtocol {
     /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
-    /// - Throws: `AsyncSequenceReaderError.terminationNotFound` if a complete byte sequence could not be returned by the time the sequence ended.
+    /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     public mutating func collect(
         upToExcluding termination: some Collection<Element>,
         throwsIfOver maximumBufferSize: Int
