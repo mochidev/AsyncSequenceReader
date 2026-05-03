@@ -221,7 +221,7 @@ import Testing
             }.reduce(into: [], { $0.append($1) })
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:175: Assertion failed: count must be larger than 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:186: Assertion failed: count must be larger than 0")
         #endif
     }
     
@@ -236,7 +236,7 @@ import Testing
             }.reduce(into: [], { $0.append($1) })
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:240: Precondition failed: minCount must be larger than or equal to 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:254: Precondition failed: minCount must be larger than or equal to 0")
         #endif
     }
     
@@ -251,7 +251,7 @@ import Testing
             }.reduce(into: [], { $0.append($1) })
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:240: Precondition failed: minCount must be larger than or equal to 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:254: Precondition failed: minCount must be larger than or equal to 0")
         #endif
     }
     
@@ -266,7 +266,7 @@ import Testing
             }.reduce(into: [], { $0.append($1) })
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:239: Precondition failed: maxCount must be larger than or equal to minCount")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:253: Precondition failed: maxCount must be larger than or equal to minCount")
         #endif
     }
     
@@ -280,7 +280,7 @@ import Testing
             }
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:89: Assertion failed: count must be larger than or equal to 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:94: Assertion failed: count must be larger than or equal to 0")
         #endif
     }
     
@@ -306,7 +306,7 @@ import Testing
                 try await sequence.reduce(into: "") { $0 += ($0.isEmpty ? "" : " ") + String($1) }
             }
         }
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:134: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:142: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
         #endif
     }
     
@@ -320,7 +320,7 @@ import Testing
             }
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:134: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:142: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
         #endif
     }
     
@@ -346,7 +346,7 @@ import Testing
             }
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:134: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:142: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
         #endif
     }
     
@@ -372,7 +372,7 @@ import Testing
             }
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:134: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:142: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
         #endif
     }
     
