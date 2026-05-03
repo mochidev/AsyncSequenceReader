@@ -12,9 +12,10 @@
 /// Note that to conform to this protocol, your type must be a reference type. After iterating, you'll also likely want to copy the base iterator back into your starting iterator, as shown in ``AsyncIteratorProtocol/transform(with:readSequenceFactory:)``.
 public protocol AsyncReadSequence: AsyncSequence, AnyObject {
     associatedtype BaseIterator: AsyncIteratorProtocol where BaseIterator.Element == Element
+    associatedtype BaseFailure: Error
     
     @inlinable
-    var baseIterator: AsyncBufferedIterator<BaseIterator> { get }
+    var baseIterator: AsyncBufferedIterator<BaseIterator, BaseFailure> { get }
 }
 
 extension AsyncIteratorProtocol {
@@ -26,14 +27,15 @@ extension AsyncIteratorProtocol {
     /// - Parameter readSequenceFactory: A factory to create a suitable ``AsyncReadSequence`` that will determine the logical bounds of the transformation within the receiving iterator.
     /// - Returns: A transformed value read from the iterator, or `nil` if there were no values left to read.
     public mutating func transform<
-        Transformed, ReadSequence: AsyncReadSequence,
+        ReadSequence: AsyncReadSequence,
+        Transformed,
         TransformFailure: Error
     >(
         with sequenceTransform: sending (sending ReadSequence) async throws(TransformFailure) -> Transformed,
-        readSequenceFactory: (inout AsyncBufferedIterator<Self>) -> ReadSequence
+        readSequenceFactory: (inout AsyncBufferedIterator<Self, ReadSequence.BaseFailure>) -> ReadSequence
     ) async throws(TransformFailure) -> Transformed? where ReadSequence.BaseIterator == Self {
         var results: Transformed? = nil
-        var wrappedIterator = AsyncBufferedIterator(self)
+        var wrappedIterator = AsyncBufferedIterator<_, ReadSequence.BaseFailure>(self)
         if await wrappedIterator.hasMoreData() {
             nonisolated(unsafe) let readSequence = readSequenceFactory(&wrappedIterator)
             results = try await sequenceTransform(readSequence)
@@ -60,7 +62,7 @@ extension AsyncBufferedIterator {
     >(
         with sequenceTransform: sending (sending ReadSequence) async throws(TransformFailure) -> Transformed,
         readSequenceFactory: (inout Self) -> ReadSequence
-    ) async throws(TransformFailure) -> Transformed? where ReadSequence.BaseIterator == BaseIterator {
+    ) async throws(TransformFailure) -> Transformed? where ReadSequence.BaseIterator == BaseIterator, ReadSequence.BaseFailure == Failure {
         var results: Transformed? = nil
         if await self.hasMoreData() {
             nonisolated(unsafe) let readSequence = readSequenceFactory(&self)

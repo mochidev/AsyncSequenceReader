@@ -197,7 +197,7 @@ extension AsyncIteratorProtocol {
         TransformFailure: Error
     >(
         upToIncluding termination: Element,
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws(TransformFailure) -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, any Error, Array<Element>>) async throws(TransformFailure) -> Transformed
     ) async throws(TransformFailure) -> Transformed? where Element: Equatable {
         try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
     }
@@ -240,9 +240,9 @@ extension AsyncIteratorProtocol {
         TransformFailure: Error
     >(
         upToIncluding termination: TerminationCollection,
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, TerminationCollection>) async throws(TransformFailure) -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, any Error, TerminationCollection>) async throws(TransformFailure) -> Transformed
     ) async throws(TransformFailure) -> Transformed? where Element: Equatable {
-        try await transform(with: sequenceTransform) { .init($0, termination: termination) }
+        try await transform(with: sequenceTransform) { AsyncReadUpToElementsSequence<Self, any Error, TerminationCollection>($0, termination: termination) }
     }
 }
 
@@ -279,10 +279,13 @@ extension AsyncBufferedIterator where Element: Equatable {
     /// - Parameter termination: The element marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
-    public mutating func collect<Transformed>(
+    public mutating func collect<
+        Transformed,
+        TransformFailure: Error
+    >(
         upToIncluding termination: Element,
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws -> Transformed
-    ) async rethrows -> Transformed? {
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<BaseIterator, Failure, Array<Element>>) async throws(TransformFailure) -> Transformed
+    ) async throws(TransformFailure) -> Transformed? {
         try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
     }
     
@@ -320,11 +323,12 @@ extension AsyncBufferedIterator where Element: Equatable {
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     public mutating func collect<
         TerminationCollection: Collection<Element>,
-        Transformed
+        Transformed,
+        TransformFailure: Error
     >(
         upToIncluding termination: TerminationCollection,
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<BaseIterator, TerminationCollection>) async throws -> Transformed
-    ) async rethrows -> Transformed? {
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<BaseIterator, Failure, TerminationCollection>) async throws(TransformFailure) -> Transformed
+    ) async throws(TransformFailure) -> Transformed? {
         try await transform(with: sequenceTransform) { .init($0, termination: termination) }
     }
 }
@@ -332,19 +336,20 @@ extension AsyncBufferedIterator where Element: Equatable {
 /// An asynchronous sequence that will read from a mutable iterator so long as the specified conditions are valid.
 public class AsyncReadUpToElementsSequence<
     BaseIterator: AsyncIteratorProtocol,
+    Failure: Error,
     TerminationCollection: Collection
 >: AsyncReadSequence where TerminationCollection.Element == BaseIterator.Element, TerminationCollection.Element: Equatable {
     /// The baseIterator to read from.
     ///
     /// When finished with the sequence, callers should read back this value so they can continue iterating on the sequence.
-    public var baseIterator: AsyncBufferedIterator<BaseIterator>
+    public var baseIterator: AsyncBufferedIterator<BaseIterator, Failure>
     
     @usableFromInline
     let termination: TerminationCollection
     
     @usableFromInline
     init(
-        _ baseIterator: AsyncBufferedIterator<BaseIterator>,
+        _ baseIterator: AsyncBufferedIterator<BaseIterator, Failure>,
         termination: TerminationCollection
     ) {
         precondition(!termination.isEmpty, "termination must not be empty")

@@ -63,7 +63,7 @@ import Testing
     @Test func readSequenceFromTestSequence() async throws {
         let testStream = TestSequence(base: 0..<10)
         
-        var iterator = AsyncBufferedIterator(testStream.makeAsyncIterator())
+        var iterator = AsyncBufferedIterator<_, Never>(testStream.makeAsyncIterator())
         
         let readSequenceA = AsyncSequenceReader(iterator) { iterator in
             let next = await iterator.next()
@@ -152,7 +152,7 @@ import Testing
         }
     }
     
-    func makeReadFourElementSequence<BaseIterator>(_ iterator: inout AsyncBufferedIterator<BaseIterator>) -> AsyncSequenceReader<BaseIterator> {
+    func makeReadFourElementSequence<BaseIterator, BaseFailure: Error>(_ iterator: inout AsyncBufferedIterator<BaseIterator, BaseFailure>) -> AsyncSequenceReader<BaseIterator, BaseFailure, BaseFailure> {
         var totalRead: Int = 0
         return AsyncSequenceReader(iterator) { iterator in
             guard totalRead < 4 else { return nil }

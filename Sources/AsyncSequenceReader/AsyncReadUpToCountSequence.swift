@@ -51,6 +51,8 @@ extension AsyncIteratorProtocol {
         return result
     }
     
+    // TODO: typed throws above
+    
     /// Collect the specified number of elements into a sequence, and transform it using the provided closure.
     ///
     /// In this example, an asynchronous sequence of Strings encodes sentences by prefixing each word sequence with a number.
@@ -82,10 +84,13 @@ extension AsyncIteratorProtocol {
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     /// - Throws: `AsyncSequenceReaderError.insufficientElements` if a complete byte sequence could not be returned by the time the sequence ended.
-    public mutating func collect<Transformed>(
+    public mutating func collect<
+        Transformed,
+        TransformFailure: Error
+    >(
         _ count: Int,
-        sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self>) async throws -> Transformed
-    ) async throws -> Transformed? {
+        sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self, any Error>) async throws(TransformFailure) -> Transformed
+    ) async throws(TransformFailure) -> Transformed? {
         assert(count >= 0, "count must be larger than or equal to 0")
         return try await collect(min: count, max: count, sequenceTransform: sequenceTransform)
     }
@@ -124,15 +129,18 @@ extension AsyncIteratorProtocol {
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     /// - Throws: `AsyncSequenceReaderError.insufficientElements` if a complete byte sequence could not be returned by the time the sequence ended.
-    public mutating func collect<Transformed>(
+    public mutating func collect<
+        Transformed,
+        TransformFailure: Error
+    >(
         min minCount: Int = 1,
         max maxCount: Int,
-        sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self>) async throws -> Transformed
-    ) async throws -> Transformed? {
+        sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self, any Error>) async throws(TransformFailure) -> Transformed
+    ) async throws(TransformFailure) -> Transformed? {
         /// It is unsafe to read ahead in this case, so exit early if we know we won't need to read.
         if maxCount == 0 { return nil }
         assert(minCount >= 1, "minCount must be larger than or equal to 1, or the first value risks getting dropped")
-        return try await transform(with: sequenceTransform) { .init($0, minCount: minCount, maxCount: maxCount) }
+        return try await transform(with: sequenceTransform) { AsyncReadUpToCountSequence<Self, any Error>($0, minCount: minCount, maxCount: maxCount) }
     }
 }
 
@@ -168,10 +176,13 @@ extension AsyncBufferedIterator {
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     /// - Throws: `AsyncSequenceReaderError.insufficientElements` if a complete byte sequence could not be returned by the time the sequence ended.
-    public mutating func collect<Transformed>(
+    public mutating func collect<
+        Transformed,
+        TransformFailure: Error
+    >(
         _ count: Int,
-        sequenceTransform: sending (sending AsyncReadUpToCountSequence<BaseIterator>) async throws -> Transformed
-    ) async throws -> Transformed? {
+        sequenceTransform: sending (sending AsyncReadUpToCountSequence<BaseIterator, Failure>) async throws(TransformFailure) -> Transformed
+    ) async throws(TransformFailure) -> Transformed? {
         assert(count >= 0, "count must be larger than 0")
         return try await collect(min: count, max: count, sequenceTransform: sequenceTransform)
     }
@@ -208,21 +219,27 @@ extension AsyncBufferedIterator {
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     /// - Throws: `AsyncSequenceReaderError.insufficientElements` if a complete byte sequence could not be returned by the time the sequence ended.
-    public mutating func collect<Transformed>(
+    public mutating func collect<
+        Transformed,
+        TransformFailure: Error
+    >(
         min minCount: Int = 0,
         max maxCount: Int,
-        sequenceTransform: sending (sending AsyncReadUpToCountSequence<BaseIterator>) async throws -> Transformed
-    ) async throws -> Transformed? {
+        sequenceTransform: sending (sending AsyncReadUpToCountSequence<BaseIterator, Failure>) async throws(TransformFailure) -> Transformed
+    ) async throws(TransformFailure) -> Transformed? {
         try await transform(with: sequenceTransform) { .init($0, minCount: minCount, maxCount: maxCount) }
     }
 }
 
 /// An asynchronous sequence that will read from a mutable iterator so long as the specified conditions are valid.
-public final class AsyncReadUpToCountSequence<BaseIterator: AsyncIteratorProtocol>: AsyncReadSequence {
+public final class AsyncReadUpToCountSequence<
+    BaseIterator: AsyncIteratorProtocol,
+    BaseFailure: Error
+>: AsyncReadSequence {
     /// The baseIterator to read from.
     ///
     /// When finished with the sequence, callers should read back this value so they can continue iterating on the sequence.
-    public var baseIterator: AsyncBufferedIterator<BaseIterator>
+    public var baseIterator: AsyncBufferedIterator<BaseIterator, BaseFailure>
     
     @usableFromInline
     let minCount: Int
@@ -232,7 +249,7 @@ public final class AsyncReadUpToCountSequence<BaseIterator: AsyncIteratorProtoco
     
     @usableFromInline
     init(
-        _ baseIterator: AsyncBufferedIterator<BaseIterator>,
+        _ baseIterator: AsyncBufferedIterator<BaseIterator, BaseFailure>,
         minCount: Int,
         maxCount: Int
     ) {

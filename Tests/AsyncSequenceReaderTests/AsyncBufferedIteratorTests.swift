@@ -36,7 +36,7 @@ import Testing
         #expect(await bufferedIterator.hasMoreData() == true)
         #expect(await bufferedIterator.hasMoreData() == true)
         #expect(await bufferedIterator.next() == 5)
-        #expect(try await bufferedIterator.nonIsolatedNext() == 6)
+        #expect(await bufferedIterator.nonIsolatedNext() == 6)
         #expect(await bufferedIterator.next() == 7)
         #expect(await bufferedIterator.next() == 8)
         #expect(await bufferedIterator.hasMoreData() == true)
@@ -61,7 +61,7 @@ import Testing
         #expect(await iterator.next() == 0)
         #expect(await iterator.next() == 1)
         
-        var bufferedIterator = AsyncBufferedIterator(iterator)
+        var bufferedIterator = AsyncBufferedIterator<_, Never>(iterator)
         
         #expect(await bufferedIterator.next() == 2)
         #expect(await bufferedIterator.next() == 3)
@@ -70,7 +70,7 @@ import Testing
         #expect(await bufferedIterator.hasMoreData() == true)
         #expect(await bufferedIterator.hasMoreData() == true)
         #expect(await bufferedIterator.next() == 5)
-        #expect(try await bufferedIterator.nonIsolatedNext() == 6)
+        #expect(await bufferedIterator.nonIsolatedNext() == 6)
         #expect(await bufferedIterator.next() == 7)
         #expect(await bufferedIterator.next() == 8)
         #expect(await bufferedIterator.hasMoreData() == true)
