@@ -18,25 +18,27 @@ extension AsyncSequence {
     /// The closure provided to the `iteratorMap(_:)` first reads the first available string, interpreting it as a number.
     /// Then, it will loop the specified number of times, accumulating those words into an array, that is finally assembled into a sentence.
     ///
-    ///     let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"
+    /// ```swift
+    /// let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"
     ///
-    ///     let sentenceStream = dataStream.iteratorMap { iterator -> String? in
-    ///         var count = Int(try await iterator.next() ?? "")!
+    /// let sentenceStream = dataStream.iteratorMap { iterator -> String? in
+    ///     var count = Int(try await iterator.next() ?? "")!
     ///
-    ///         var results: [String] = []
+    ///     var results: [String] = []
     ///
-    ///         while count > 0, let next = try await iterator.next() {
-    ///             results.append(next)
-    ///             count -= 1
-    ///         }
-    ///
-    ///         return results.joined(separator: " ")
+    ///     while count > 0, let next = try await iterator.next() {
+    ///         results.append(next)
+    ///         count -= 1
     ///     }
     ///
-    ///     for await sentence in sentenceStream {
-    ///         print("\"\(sentence)\"", terminator: ", ")
-    ///     }
-    ///     // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
+    ///     return results.joined(separator: " ")
+    /// }
+    ///
+    /// for await sentence in sentenceStream {
+    ///     print("\"\(sentence)\"", terminator: ", ")
+    /// }
+    /// // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
+    /// ```
     ///
     /// - Note: This overload covers when the transformation throws a different (or no) error than the underlying sequence.
     /// - Parameter transform: A mapping closure. `transform` accepts an iterator representing the original sequence as its parameter and returns a transformed value. Returning `nil` will stop the sequence early, as will throwing an error.
@@ -59,31 +61,33 @@ extension AsyncSequence {
     /// The closure provided to the `iteratorMap(_:)` first reads the first available string, interpreting it as a number.
     /// Then, it will loop the specified number of times, accumulating those words into an array, that is finally assembled into a sentence.
     ///
-    ///     let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"
+    /// ```swift
+    /// let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"
     ///
-    ///     let sentenceStream = dataStream.iteratorMap { iterator -> String? in
-    ///         guard var count = Int(try await iterator.next() ?? "") else {
-    ///             throw SentenceParsing.invalidWordCount
-    ///         }
-    ///
-    ///         var results: [String] = []
-    ///
-    ///         while count > 0, let next = try await iterator.next() {
-    ///             results.append(next)
-    ///             count -= 1
-    ///         }
-    ///
-    ///         guard count == 0 else {
-    ///             throw SentenceParsing.missingFinalWords
-    ///         }
-    ///
-    ///         return results.joined(separator: " ")
+    /// let sentenceStream = dataStream.iteratorMap { iterator -> String? in
+    ///     guard var count = Int(try await iterator.next() ?? "") else {
+    ///         throw SentenceParsing.invalidWordCount
     ///     }
     ///
-    ///     for try await sentence in sentenceStream {
-    ///         print("\"\(sentence)\"", terminator: ", ")
+    ///     var results: [String] = []
+    ///
+    ///     while count > 0, let next = try await iterator.next() {
+    ///         results.append(next)
+    ///         count -= 1
     ///     }
-    ///     // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
+    ///
+    ///     guard count == 0 else {
+    ///         throw SentenceParsing.missingFinalWords
+    ///     }
+    ///
+    ///     return results.joined(separator: " ")
+    /// }
+    ///
+    /// for try await sentence in sentenceStream {
+    ///     print("\"\(sentence)\"", terminator: ", ")
+    /// }
+    /// // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
+    /// ```
     ///
     /// - Note: This overload covers when the transformation throws the same (or no) error than the underlying sequence, but can only be verified on newer distributions of Swift.
     /// - Parameter transform: A mapping closure. `transform` accepts an iterator representing the original sequence as its parameter and returns a transformed value. Returning `nil` will stop the sequence early, as will throwing an error.
@@ -108,25 +112,27 @@ extension Sequence where Self: Sendable {
     /// The closure provided to the `iteratorMap(_:)` first reads the first available string, interpreting it as a number.
     /// Then, it will loop the specified number of times, accumulating those words into an array, that is finally assembled into a sentence.
     ///
-    ///     let dataStream = ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"]
+    /// ```swift
+    /// let dataStream = ["2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"]
     ///
-    ///     let sentenceStream = dataStream.iteratorMap { iterator -> String? in
-    ///         var count = Int(try await iterator.next() ?? "")!
+    /// let sentenceStream = dataStream.iteratorMap { iterator -> String? in
+    ///     var count = Int(try await iterator.next() ?? "")!
     ///
-    ///         var results: [String] = []
+    ///     var results: [String] = []
     ///
-    ///         while count > 0, let next = try await iterator.next() {
-    ///             results.append(next)
-    ///             count -= 1
-    ///         }
-    ///
-    ///         return results.joined(separator: " ")
+    ///     while count > 0, let next = try await iterator.next() {
+    ///         results.append(next)
+    ///         count -= 1
     ///     }
     ///
-    ///     for await sentence in sentenceStream {
-    ///         print("\"\(sentence)\"", terminator: ", ")
-    ///     }
-    ///     // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
+    ///     return results.joined(separator: " ")
+    /// }
+    ///
+    /// for await sentence in sentenceStream {
+    ///     print("\"\(sentence)\"", terminator: ", ")
+    /// }
+    /// // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
+    /// ```
     ///
     /// - Parameter transform: A mapping closure. `transform` accepts an iterator representing the original sequence as its parameter and returns a transformed value. Returning `nil` will stop the sequence early, as will throwing an error.
     /// - Returns: An asynchronous sequence that contains, in order, elements produced by the `transform` closure.

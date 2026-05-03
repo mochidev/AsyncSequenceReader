@@ -59,23 +59,25 @@ extension AsyncIteratorProtocol {
     /// The closure provided to the `iteratorMap(_:)` first reads the first available string, interpreting it as a number.
     /// Then, it will collect the next `count` elements into a new sequence, transforming it into a sentence as those elements become available.
     ///
-    ///     let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"
+    /// ```swift
+    /// let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"
     ///
-    ///     let sentenceStream = dataStream.iteratorMap { iterator -> String? in
-    ///         guard var count = Int(try await iterator.next() ?? "") else {
-    ///             throw SentenceParsing.invalidWordCount
-    ///         }
-    ///
-    ///         return try await iterator.collect(count) { sequence -> String in
-    ///             try await sequence.reduce(into: "") { $0 += ($0.isEmpty ? "" : " ") + $1 }
-    ///         }
+    /// let sentenceStream = dataStream.iteratorMap { iterator -> String? in
+    ///     guard var count = Int(try await iterator.next() ?? "") else {
+    ///         throw SentenceParsing.invalidWordCount
     ///     }
     ///
-    ///     for await sentence in sentenceStream {
-    ///         print("\"\(sentence)\"", terminator: ", ")
+    ///     return try await iterator.collect(count) { sequence -> String in
+    ///         try await sequence.reduce(into: "") { $0 += ($0.isEmpty ? "" : " ") + $1 }
     ///     }
-    ///     // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
-    ///     
+    /// }
+    ///
+    /// for await sentence in sentenceStream {
+    ///     print("\"\(sentence)\"", terminator: ", ")
+    /// }
+    /// // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
+    /// ```
+    ///
     /// - Parameter count: The number of elements the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
@@ -96,22 +98,24 @@ extension AsyncIteratorProtocol {
     /// The closure provided to the `iteratorMap(_:)` first reads the first available string, interpreting it as a number.
     /// Then, it will collect the next `count` elements into a new sequence, transforming it into a sentence as those elements become available.
     ///
-    ///     let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "2", "Bye?"
+    /// ```swift
+    /// let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "2", "Bye?"
     ///
-    ///     let sentenceStream = dataStream.iteratorMap { iterator -> String? in
-    ///         guard var count = Int(try await iterator.next() ?? "") else {
-    ///             throw SentenceParsing.invalidWordCount
-    ///         }
-    ///
-    ///         return try await iterator.collect(min: 0, max: count) { sequence -> String in
-    ///             try await sequence.reduce(into: "") { $0 += ($0.isEmpty ? "" : " ") + $1 }
-    ///         }
+    /// let sentenceStream = dataStream.iteratorMap { iterator -> String? in
+    ///     guard var count = Int(try await iterator.next() ?? "") else {
+    ///         throw SentenceParsing.invalidWordCount
     ///     }
     ///
-    ///     for await sentence in sentenceStream {
-    ///         print("\"\(sentence)\"", terminator: ", ")
+    ///     return try await iterator.collect(min: 0, max: count) { sequence -> String in
+    ///         try await sequence.reduce(into: "") { $0 += ($0.isEmpty ? "" : " ") + $1 }
     ///     }
-    ///     // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye?"
+    /// }
+    ///
+    /// for await sentence in sentenceStream {
+    ///     print("\"\(sentence)\"", terminator: ", ")
+    /// }
+    /// // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye?"
+    /// ```
     ///
     /// - Important: This variation reads ahead a single byte
     ///
@@ -141,22 +145,24 @@ extension AsyncBufferedIterator {
     /// The closure provided to the `iteratorMap(_:)` first reads the first available string, interpreting it as a number.
     /// Then, it will collect the next `count` elements into a new sequence, transforming it into a sentence as those elements become available.
     ///
-    ///     let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"
+    /// ```swift
+    /// let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "1", "Bye!"
     ///
-    ///     let sentenceStream = dataStream.iteratorMap { iterator -> String? in
-    ///         guard var count = Int(try await iterator.next() ?? "") else {
-    ///             throw SentenceParsing.invalidWordCount
-    ///         }
-    ///
-    ///         return try await iterator.collect(count) { sequence -> String in
-    ///             try await sequence.reduce(into: "") { $0 += ($0.isEmpty ? "" : " ") + $1 }
-    ///         }
+    /// let sentenceStream = dataStream.iteratorMap { iterator -> String? in
+    ///     guard var count = Int(try await iterator.next() ?? "") else {
+    ///         throw SentenceParsing.invalidWordCount
     ///     }
     ///
-    ///     for await sentence in sentenceStream {
-    ///         print("\"\(sentence)\"", terminator: ", ")
+    ///     return try await iterator.collect(count) { sequence -> String in
+    ///         try await sequence.reduce(into: "") { $0 += ($0.isEmpty ? "" : " ") + $1 }
     ///     }
-    ///     // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
+    /// }
+    ///
+    /// for await sentence in sentenceStream {
+    ///     print("\"\(sentence)\"", terminator: ", ")
+    /// }
+    /// // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
+    /// ```
     ///
     /// - Parameter count: The number of elements the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
@@ -178,22 +184,24 @@ extension AsyncBufferedIterator {
     /// The closure provided to the `iteratorMap(_:)` first reads the first available string, interpreting it as a number.
     /// Then, it will collect the next `count` elements into a new sequence, transforming it into a sentence as those elements become available.
     ///
-    ///     let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "2", "Bye?"
+    /// ```swift
+    /// let dataStream = ... // "2", "Hello,", "World!", "4", "My", "name", "is", "Dimitri.", "0", "2", "Bye?"
     ///
-    ///     let sentenceStream = dataStream.iteratorMap { iterator -> String? in
-    ///         guard var count = Int(try await iterator.next() ?? "") else {
-    ///             throw SentenceParsing.invalidWordCount
-    ///         }
-    ///
-    ///         return try await iterator.collect(min: 0, max: count) { sequence -> String in
-    ///             try await sequence.reduce(into: "") { $0 += ($0.isEmpty ? "" : " ") + $1 }
-    ///         }
+    /// let sentenceStream = dataStream.iteratorMap { iterator -> String? in
+    ///     guard var count = Int(try await iterator.next() ?? "") else {
+    ///         throw SentenceParsing.invalidWordCount
     ///     }
     ///
-    ///     for await sentence in sentenceStream {
-    ///         print("\"\(sentence)\"", terminator: ", ")
+    ///     return try await iterator.collect(min: 0, max: count) { sequence -> String in
+    ///         try await sequence.reduce(into: "") { $0 += ($0.isEmpty ? "" : " ") + $1 }
     ///     }
-    ///     // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye?"
+    /// }
+    ///
+    /// for await sentence in sentenceStream {
+    ///     print("\"\(sentence)\"", terminator: ", ")
+    /// }
+    /// // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye?"
+    /// ```
     ///
     /// - Parameter minCount: The minimum number of elements the `sequenceTransform` closure will attempt have access to. If this number cannot be guaranteed, an error will be thrown.
     /// - Parameter maxCount: The maximum number of elements the `sequenceTransform` closure will have access to.
