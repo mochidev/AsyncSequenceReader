@@ -16,17 +16,19 @@ extension AsyncIteratorProtocol {
     ///
     /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
     ///
-    ///     let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple "
+    /// ```swift
+    /// let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple "
     ///
-    ///     let wordStream = dataStream.iteratorMap { iterator -> String? in
-    ///         (try await iterator.collect(upToIncluding: " ", throwsIfOver: 100))
-    ///             .map { String($0.dropLast()) }
-    ///     }
+    /// let wordStream = dataStream.iteratorMap { iterator -> String? in
+    ///     (try await iterator.collect(upToIncluding: " ", throwsIfOver: 100))
+    ///         .map { String($0.dropLast()) }
+    /// }
     ///
-    ///     for await word in wordStream {
-    ///         print("\"\(word)\"", terminator: ", ")
-    ///     }
-    ///     // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// for await word in wordStream {
+    ///     print("\"\(word)\"", terminator: ", ")
+    /// }
+    /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// ```
     ///
     /// - Parameter termination: The element marking the end of the sequence that will be collected.
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
@@ -47,17 +49,19 @@ extension AsyncIteratorProtocol {
     ///
     /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
     ///
-    ///     let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple "
+    /// ```swift
+    /// let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple "
     ///
-    ///     let wordStream = dataStream.iteratorMap { iterator -> String? in
-    ///         (try await iterator.collect(upToIncluding: [" "], throwsIfOver: 100))
-    ///             .map { String($0.dropLast()) }
-    ///     }
+    /// let wordStream = dataStream.iteratorMap { iterator -> String? in
+    ///     (try await iterator.collect(upToIncluding: [" "], throwsIfOver: 100))
+    ///         .map { String($0.dropLast()) }
+    /// }
     ///
-    ///     for await word in wordStream {
-    ///         print("\"\(word)\"", terminator: ", ")
-    ///     }
-    ///     // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// for await word in wordStream {
+    ///     print("\"\(word)\"", terminator: ", ")
+    /// }
+    /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// ```
     ///
     /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
@@ -95,17 +99,19 @@ extension AsyncIteratorProtocol {
     ///
     /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
     ///
-    ///     let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple "
+    /// ```swift
+    /// let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple "
     ///
-    ///     let wordStream = dataStream.iteratorMap { iterator -> String? in
-    ///         (try await iterator.collect(upToExcluding: " ", throwsIfOver: 100))
-    ///             .map { String($0) }
-    ///     }
+    /// let wordStream = dataStream.iteratorMap { iterator -> String? in
+    ///     (try await iterator.collect(upToExcluding: " ", throwsIfOver: 100))
+    ///         .map { String($0) }
+    /// }
     ///
-    ///     for await word in wordStream {
-    ///         print("\"\(word)\"", terminator: ", ")
-    ///     }
-    ///     // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// for await word in wordStream {
+    ///     print("\"\(word)\"", terminator: ", ")
+    /// }
+    /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// ```
     ///
     /// - Parameter termination: The element marking the end of the sequence that will be collected.
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
@@ -126,17 +132,19 @@ extension AsyncIteratorProtocol {
     ///
     /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
     ///
-    ///     let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple "
+    /// ```swift
+    /// let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple "
     ///
-    ///     let wordStream = dataStream.iteratorMap { iterator -> String? in
-    ///         (try await iterator.collect(upToExcluding: [" "], throwsIfOver: 100))
-    ///             .map { String($0) }
-    ///     }
+    /// let wordStream = dataStream.iteratorMap { iterator -> String? in
+    ///     (try await iterator.collect(upToExcluding: [" "], throwsIfOver: 100))
+    ///         .map { String($0) }
+    /// }
     ///
-    ///     for await word in wordStream {
-    ///         print("\"\(word)\"", terminator: ", ")
-    ///     }
-    ///     // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// for await word in wordStream {
+    ///     print("\"\(word)\"", terminator: ", ")
+    /// }
+    /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// ```
     ///
     /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
@@ -160,24 +168,26 @@ extension AsyncIteratorProtocol {
     ///
     /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
     ///
-    ///     let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple"
+    /// ```swift
+    /// let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple"
     ///
-    ///     let wordStream = dataStream.iteratorMap { iterator -> String? in
-    ///         let word = await iterator.collect(upToIncluding: " ") { sequence -> String in
-    ///             await sequence.reduce(into: "") { $0.append($1) }
-    ///         }
-    ///
-    ///         if let word = word, word.hasSuffix(" ") {
-    ///             return String(word.dropLast(1))
-    ///         }
-    ///
-    ///         return word
+    /// let wordStream = dataStream.iteratorMap { iterator -> String? in
+    ///     let word = await iterator.collect(upToIncluding: " ") { sequence -> String in
+    ///         await sequence.reduce(into: "") { $0.append($1) }
     ///     }
     ///
-    ///     for await word in wordStream {
-    ///         print("\"\(word)\"", terminator: ", ")
+    ///     if let word = word, word.hasSuffix(" ") {
+    ///         return String(word.dropLast(1))
     ///     }
-    ///     // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    ///
+    ///     return word
+    /// }
+    ///
+    /// for await word in wordStream {
+    ///     print("\"\(word)\"", terminator: ", ")
+    /// }
+    /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// ```
     ///
     /// - Parameter termination: The element marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
@@ -200,24 +210,26 @@ extension AsyncIteratorProtocol {
     ///
     /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
     ///
-    ///     let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple"
+    /// ```swift
+    /// let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple"
     ///
-    ///     let wordStream = dataStream.iteratorMap { iterator -> String? in
-    ///         let word = await iterator.collect(upToIncluding: [" "]) { sequence -> String in
-    ///             await sequence.reduce(into: "") { $0.append($1) }
-    ///         }
-    ///
-    ///         if let word = word, word.hasSuffix(" ") {
-    ///             return String(word.dropLast(1))
-    ///         }
-    ///
-    ///         return word
+    /// let wordStream = dataStream.iteratorMap { iterator -> String? in
+    ///     let word = await iterator.collect(upToIncluding: [" "]) { sequence -> String in
+    ///         await sequence.reduce(into: "") { $0.append($1) }
     ///     }
     ///
-    ///     for await word in wordStream {
-    ///         print("\"\(word)\"", terminator: ", ")
+    ///     if let word = word, word.hasSuffix(" ") {
+    ///         return String(word.dropLast(1))
     ///     }
-    ///     // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    ///
+    ///     return word
+    /// }
+    ///
+    /// for await word in wordStream {
+    ///     print("\"\(word)\"", terminator: ", ")
+    /// }
+    /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// ```
     ///
     /// - Parameter termination: The sequence of elements marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
@@ -243,24 +255,26 @@ extension AsyncBufferedIterator where Element: Equatable {
     ///
     /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
     ///
-    ///     let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple"
+    /// ```swift
+    /// let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple"
     ///
-    ///     let wordStream = dataStream.iteratorMap { iterator -> String? in
-    ///         let word = await iterator.collect(upToIncluding: " ") { sequence -> String in
-    ///             await sequence.reduce(into: "") { $0.append($1) }
-    ///         }
-    ///
-    ///         if let word = word, word.hasSuffix(" ") {
-    ///             return String(word.dropLast(1))
-    ///         }
-    ///
-    ///         return word
+    /// let wordStream = dataStream.iteratorMap { iterator -> String? in
+    ///     let word = await iterator.collect(upToIncluding: " ") { sequence -> String in
+    ///         await sequence.reduce(into: "") { $0.append($1) }
     ///     }
     ///
-    ///     for await word in wordStream {
-    ///         print("\"\(word)\"", terminator: ", ")
+    ///     if let word = word, word.hasSuffix(" ") {
+    ///         return String(word.dropLast(1))
     ///     }
-    ///     // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    ///
+    ///     return word
+    /// }
+    ///
+    /// for await word in wordStream {
+    ///     print("\"\(word)\"", terminator: ", ")
+    /// }
+    /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// ```
     ///
     /// - Parameter termination: The element marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
@@ -280,24 +294,26 @@ extension AsyncBufferedIterator where Element: Equatable {
     ///
     /// The closure provided to the `iteratorMap(_:)` reads characters up to and inluding the termination provided, splitting the sequence into an array of words.
     ///
-    ///     let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple"
+    /// ```swift
+    /// let dataStream = ... // "apple orange banana kiwi kumquat pear pineapple"
     ///
-    ///     let wordStream = dataStream.iteratorMap { iterator -> String? in
-    ///         let word = await iterator.collect(upToIncluding: [" "]) { sequence -> String in
-    ///             await sequence.reduce(into: "") { $0.append($1) }
-    ///         }
-    ///
-    ///         if let word = word, word.hasSuffix(" ") {
-    ///             return String(word.dropLast(1))
-    ///         }
-    ///
-    ///         return word
+    /// let wordStream = dataStream.iteratorMap { iterator -> String? in
+    ///     let word = await iterator.collect(upToIncluding: [" "]) { sequence -> String in
+    ///         await sequence.reduce(into: "") { $0.append($1) }
     ///     }
     ///
-    ///     for await word in wordStream {
-    ///         print("\"\(word)\"", terminator: ", ")
+    ///     if let word = word, word.hasSuffix(" ") {
+    ///         return String(word.dropLast(1))
     ///     }
-    ///     // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    ///
+    ///     return word
+    /// }
+    ///
+    /// for await word in wordStream {
+    ///     print("\"\(word)\"", terminator: ", ")
+    /// }
+    /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
+    /// ```
     ///
     /// - Parameter termination: The sequence of elements marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
