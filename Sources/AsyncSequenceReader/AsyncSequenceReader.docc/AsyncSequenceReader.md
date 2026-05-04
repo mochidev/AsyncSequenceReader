@@ -67,7 +67,7 @@ Reading values in an iterator map one at a time is useful, but often times we ne
 ```swift
 var fourByteSequence = try await iterator.collect(4) // [UInt8, UInt8, UInt8, UInt8]?
 var largeSequence = try await iterator.collect(max: 256) // Array of [UInt8]? with a max size of 256, but may be shorter if the sequence had less than 256 characters available.
-var limitedSequence = try await iterator.collect(min: 128, max: 256) // Array of [UInt8]? that will throw if at least 128 bytes are available, but will be no larger than 256.
+var limitedSequence = try await iterator.collect(min: 128, max: 256) // Array of [UInt8]? that will throw if less than 128 bytes are available, but will be no larger than 256.
 ```
 
 For that last example, do note that the `limitedSequence` will only become available if and when all the bytes have been read. ie. you will not get results back if only 128 bytes are available _right now_, if the sequence is still ongoing.
@@ -91,7 +91,7 @@ var veryLargeSequence = try await iterator.collect(1024*1024*1024) { sequence ->
 
 In the above example, our sequence transform gives us access to a sequence that will be at most `1024*1024*1024` bytes large, which is 1 GB! However, instead of accumulating that data into an array, we get a sequence back, which we can attach an iterator map to so we can process the data 1 MB at a time, combining that data into a `DataFrame` type. Then, we can consume this transformed sequence, reducing it to calculate averages for each data frame, and storing those averages in a `Summary` object.
 
-Note that this whole time, no more than around 1 MB of memory will be used at a time, because it'll only actually be consumes while reducing the results, which will only read 1 MB of data at a time, and will stop once a total of 1 GB of data has been read.
+Note that this whole time, no more than around 1 MB of memory will be used at a time, because it'll only actually be consumed while reducing the results, which will only read 1 MB of data at a time, and will stop once a total of 1 GB of data has been read.
 
 ### Terminated Collections
 
@@ -108,7 +108,7 @@ Note how a `throwsIfOver` parameter is necessary — this is to prevent un-bound
 
 You can bypass the `throwsIfOver` parameter if you use a **sequence transform** instead, which may be a better option if your algorithm deals with large amounts of data. If you stop reading early, elements can still be read by subsequent requests, giving you more control over how to read your data.
 
-Also note that if you use a **sequence transform**, you can only collect a sequence up to and including your terminator, and no error will be thrown if your terminator was never encountered, since you can easily check `result.suffix(termination.count) == termination` to verify this yourself, allowing you the possibility of handling different data lengths yourself.
+Also note that if you use a **sequence transform**, you can only collect a sequence up to and including your terminator, and no error will be thrown if your terminator was never encountered, since you can easily check `result.suffix(termination.count).elementsEqual(termination)` to verify this yourself, allowing you the possibility of handling different data lengths yourself.
 
 ### Integration with Bytes
 

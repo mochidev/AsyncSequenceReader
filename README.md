@@ -1,4 +1,4 @@
-# AsyncSequenceReader
+<h1 align="center">Async Sequence Reader</h1>
 
 <p align="center">
 <a href="https://swiftpackageindex.com/mochidev/AsyncSequenceReader">
@@ -27,7 +27,7 @@ Please check the [releases](https://github.com/mochidev/AsyncSequenceReader/rele
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/mochidev/AsyncSequenceReader.git", .upToNextMinor(from: "0.3.1")),
+    .package(url: "https://github.com/mochidev/AsyncSequenceReader.git", .upToNextMinor(from: "0.4.0")),
 ],
 ...
 targets: [
@@ -129,7 +129,7 @@ var veryLargeSequence = try await iterator.collect(1024*1024*1024) { sequence ->
 
 In the above example, our sequence transform gives us access to a sequence that will be at most `1024*1024*1024` bytes large, which is 1 GB! However, instead of accumulating that data into an array, we get a sequence back, which we can attach an iterator map to so we can process the data 1 MB at a time, combining that data into a `DataFrame` type. Then, we can consume this transformed sequence, reducing it to calculate averages for each data frame, and storing those averages in a `Summary` object.
 
-Note that this whole time, no more than around 1 MB of memory will be used at a time, because it'll only actually be consumes while reducing the results, which will only read 1 MB of data at a time, and will stop once a total of 1 GB of data has been read.
+Note that this whole time, no more than around 1 MB of memory will be used at a time, because it'll only actually be consumed while reducing the results, which will only read 1 MB of data at a time, and will stop once a total of 1 GB of data has been read.
 
 ### Terminated Collections
 
@@ -146,7 +146,7 @@ Note how a `throwsIfOver` parameter is necessary — this is to prevent un-bound
 
 You can bypass the `throwsIfOver` parameter if you use a **sequence transform** instead, which may be a better option if your algorithm deals with large amounts of data. If you stop reading early, elements can still be read by subsequent requests, giving you more control over how to read your data.
 
-Also note that if you use a **sequence transform**, you can only collect a sequence up to and including your terminator, and no error will be thrown if your terminator was never encountered, since you can easily check `result.suffix(termination.count) == termination` to verify this yourself, allowing you the possibility of handling different data lengths yourself.
+Also note that if you use a **sequence transform**, you can only collect a sequence up to and including your terminator, and no error will be thrown if your terminator was never encountered, since you can easily check `result.suffix(termination.count).elementsEqual(termination)` to verify this yourself, allowing you the possibility of handling different data lengths yourself.
 
 ### Integration with Bytes
 
