@@ -221,7 +221,7 @@ import Testing
             }.reduce(into: [], { $0.append($1) })
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:232: Assertion failed: count must be larger than 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:262: Assertion failed: count must be larger than 0")
         #endif
     }
     
@@ -236,7 +236,7 @@ import Testing
             }.reduce(into: [], { $0.append($1) })
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:300: Precondition failed: minCount must be larger than or equal to 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:331: Precondition failed: minCount must be larger than or equal to 0")
         #endif
     }
     
@@ -251,7 +251,7 @@ import Testing
             }.reduce(into: [], { $0.append($1) })
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:300: Precondition failed: minCount must be larger than or equal to 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:331: Precondition failed: minCount must be larger than or equal to 0")
         #endif
     }
     
@@ -266,7 +266,7 @@ import Testing
             }.reduce(into: [], { $0.append($1) })
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:299: Precondition failed: maxCount must be larger than or equal to minCount")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:330: Precondition failed: maxCount must be larger than or equal to minCount")
         #endif
     }
     
@@ -280,7 +280,7 @@ import Testing
             }
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:140: Assertion failed: count must be larger than or equal to 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:168: Assertion failed: count must be larger than or equal to 0")
         #endif
     }
     
@@ -293,9 +293,9 @@ import Testing
         }
         #if DEBUG
         #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:18: Assertion failed: count must be larger than or equal to 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:19: Assertion failed: count must be larger than or equal to 0")
         #else
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:64: Assertion failed: count must be larger than or equal to 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:67: Assertion failed: count must be larger than or equal to 0")
         #endif
         #endif
     }
@@ -310,7 +310,7 @@ import Testing
                 try await sequence.reduce(into: "") { $0 += ($0.isEmpty ? "" : " ") + String($1) }
             }
         }
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:188: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:217: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
         #endif
     }
     
@@ -324,7 +324,7 @@ import Testing
             }
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:188: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:217: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
         #endif
     }
     
@@ -337,9 +337,9 @@ import Testing
         }
         #if DEBUG
         #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:31: Precondition failed: minCount must be larger than or equal to 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:33: Precondition failed: minCount must be larger than or equal to 0")
         #else
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:77: Precondition failed: minCount must be larger than or equal to 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:104: Precondition failed: minCount must be larger than or equal to 0")
         #endif
         #endif
     }
@@ -354,7 +354,7 @@ import Testing
             }
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:188: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:217: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
         #endif
     }
     
@@ -367,9 +367,9 @@ import Testing
         }
         #if DEBUG
         #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:31: Precondition failed: minCount must be larger than or equal to 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:33: Precondition failed: minCount must be larger than or equal to 0")
         #else
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:77: Precondition failed: minCount must be larger than or equal to 0")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:104: Precondition failed: minCount must be larger than or equal to 0")
         #endif
         #endif
     }
@@ -384,7 +384,7 @@ import Testing
             }
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:188: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:217: Assertion failed: minCount must be larger than or equal to 1, or the first value risks getting dropped")
         #endif
     }
     
@@ -397,9 +397,9 @@ import Testing
         }
         #if DEBUG
         #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:30: Precondition failed: maxCount must be larger than or equal to minCount")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:32: Precondition failed: maxCount must be larger than or equal to minCount")
         #else
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:76: Precondition failed: maxCount must be larger than or equal to minCount")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadUpToCountSequence.swift:103: Precondition failed: maxCount must be larger than or equal to minCount")
         #endif
         #endif
     }
