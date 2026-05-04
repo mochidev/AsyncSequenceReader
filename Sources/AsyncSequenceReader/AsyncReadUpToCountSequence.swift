@@ -14,6 +14,7 @@ extension AsyncIteratorProtocol {
     /// - Parameter count: The number of elements to collect.
     /// - Returns: A collection with exactly `count` elements, or `nil` if the sequence is finished.
     /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect(_ count: Int) async throws -> [Element]? {
         assert(count >= 0, "count must be larger than or equal to 0")
         return try await collect(min: count, max: count)
@@ -26,6 +27,7 @@ extension AsyncIteratorProtocol {
     /// - Parameter maxCount: The maximum number of elements to collect.
     /// - Returns: A collection with at least `minCount` and at most `maxCount` elements, or `nil` if the sequence is finished.
     /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect(min minCount: Int = 0, max maxCount: Int) async throws -> [Element]? {
         precondition(minCount <= maxCount, "maxCount must be larger than or equal to minCount")
         precondition(minCount >= 0, "minCount must be larger than or equal to 0")
@@ -60,9 +62,33 @@ extension AsyncIteratorProtocol where Failure == Never {
     /// - Parameter count: The number of elements to collect.
     /// - Returns: A collection with exactly `count` elements, or `nil` if the sequence is finished.
     /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect(_ count: Int) async throws(AsyncSequenceReaderError) -> [Element]? {
         assert(count >= 0, "count must be larger than or equal to 0")
+        #if compiler(<6.1.3) || compiler(>=6.2)
         return try await collect(min: count, max: count)
+        #else /// The above crashes the Swift 6.1.3 compiler. Make sure to inline it manually:
+        if count == 0 { return [] }
+        
+        var result = [Element]()
+        result.reserveCapacity(count)
+        
+        while let next = await _nextIsolated() {
+            result.append(next)
+            
+            if result.count == count {
+                return result
+            }
+        }
+        
+        guard !result.isEmpty else { return nil }
+        
+        guard result.count >= count else {
+            throw AsyncSequenceReaderError.insufficientElements(minimum: count, actual: result.count)
+        }
+        
+        return result
+        #endif
     }
     
     /// Asynchronously advances by the specified minimum number of elements, continuing until the specified maximum number of elements, or ends the sequence if there is no next element.
@@ -72,6 +98,7 @@ extension AsyncIteratorProtocol where Failure == Never {
     /// - Parameter maxCount: The maximum number of elements to collect.
     /// - Returns: A collection with at least `minCount` and at most `maxCount` elements, or `nil` if the sequence is finished.
     /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect(min minCount: Int = 0, max maxCount: Int) async throws(AsyncSequenceReaderError) -> [Element]? {
         precondition(minCount <= maxCount, "maxCount must be larger than or equal to minCount")
         precondition(minCount >= 0, "minCount must be larger than or equal to 0")
@@ -130,6 +157,7 @@ extension AsyncIteratorProtocol {
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect<
         Transformed,
         TransformFailure
@@ -175,6 +203,7 @@ extension AsyncIteratorProtocol {
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect<
         Transformed,
         TransformFailure
@@ -222,6 +251,7 @@ extension AsyncBufferedIterator {
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect<
         Transformed,
         TransformFailure
@@ -265,6 +295,7 @@ extension AsyncBufferedIterator {
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect<
         Transformed,
         TransformFailure: Error

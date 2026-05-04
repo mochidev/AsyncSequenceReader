@@ -7,7 +7,7 @@
 //  async-sequence-reader-watermark: 7E20A9CAB0604E89B17C6747A34F00C0
 //
 
-extension AsyncIteratorProtocol {
+extension AsyncIteratorProtocol where Element: Equatable {
     /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, including the termination sequence.
     ///
     /// If the termination sequence was not detected before the end of the stream, or more than the specified maximum elements are read, an error will be thrown.
@@ -34,10 +34,11 @@ extension AsyncIteratorProtocol {
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect(
         upToIncluding termination: Element,
         throwsIfOver maximumBufferSize: Int
-    ) async throws -> [Element]? where Element: Equatable {
+    ) async throws -> [Element]? {
         try await collect(upToIncluding: [termination], throwsIfOver: maximumBufferSize)
     }
     
@@ -67,10 +68,11 @@ extension AsyncIteratorProtocol {
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect(
         upToIncluding termination: some Collection<Element>,
         throwsIfOver maximumBufferSize: Int
-    ) async throws -> [Element]? where Element: Equatable {
+    ) async throws -> [Element]? {
         precondition(!termination.isEmpty, "termination must not be empty")
         var result = [Element]()
         
@@ -117,10 +119,11 @@ extension AsyncIteratorProtocol {
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect(
         upToExcluding termination: Element,
         throwsIfOver maximumBufferSize: Int
-    ) async throws -> [Element]? where Element: Equatable {
+    ) async throws -> [Element]? {
         try await collect(upToExcluding: [termination], throwsIfOver: maximumBufferSize)
     }
     
@@ -150,16 +153,17 @@ extension AsyncIteratorProtocol {
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect(
         upToExcluding termination: some Collection<Element>,
         throwsIfOver maximumBufferSize: Int
-    ) async throws -> [Element]? where Element: Equatable {
+    ) async throws -> [Element]? {
         try await collect(upToIncluding: termination, throwsIfOver: maximumBufferSize)?.dropLast(termination.count)
     }
 }
 
 @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
-extension AsyncIteratorProtocol where Failure == Never {
+extension AsyncIteratorProtocol where Element: Equatable, Failure == Never {
     /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, including the termination sequence.
     ///
     /// If the termination sequence was not detected before the end of the stream, or more than the specified maximum elements are read, an error will be thrown.
@@ -186,11 +190,33 @@ extension AsyncIteratorProtocol where Failure == Never {
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect(
         upToIncluding termination: Element,
         throwsIfOver maximumBufferSize: Int
-    ) async throws(AsyncSequenceReaderError) -> [Element]? where Element: Equatable {
+    ) async throws(AsyncSequenceReaderError) -> [Element]? {
+        #if compiler(<6.1.3) || compiler(>=6.2)
         try await collect(upToIncluding: [termination], throwsIfOver: maximumBufferSize)
+        #else /// The above crashes the Swift 6.1.3 compiler. Make sure to inline it manually:
+        let termination = [termination]
+        var result = [Element]()
+        
+        while let next = await _nextIsolated() {
+            if result.count == maximumBufferSize {
+                throw AsyncSequenceReaderError.terminationNotFound(maximum: maximumBufferSize, actual: result.count + 1)
+            }
+            
+            result.append(next)
+            
+            if result.suffix(termination.count).elementsEqual(termination) {
+                return result
+            }
+        }
+        
+        guard !result.isEmpty else { return nil }
+        
+        throw AsyncSequenceReaderError.terminationNotFound(maximum: maximumBufferSize, actual: result.count)
+        #endif
     }
     
     /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, including the termination sequence.
@@ -219,10 +245,11 @@ extension AsyncIteratorProtocol where Failure == Never {
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect(
         upToIncluding termination: some Collection<Element>,
         throwsIfOver maximumBufferSize: Int
-    ) async throws(AsyncSequenceReaderError) -> [Element]? where Element: Equatable {
+    ) async throws(AsyncSequenceReaderError) -> [Element]? {
         precondition(!termination.isEmpty, "termination must not be empty")
         var result = [Element]()
         
@@ -269,11 +296,33 @@ extension AsyncIteratorProtocol where Failure == Never {
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect(
         upToExcluding termination: Element,
         throwsIfOver maximumBufferSize: Int
-    ) async throws(AsyncSequenceReaderError) -> [Element]? where Element: Equatable {
+    ) async throws(AsyncSequenceReaderError) -> [Element]? {
+        #if compiler(<6.1.3) || compiler(>=6.2)
         try await collect(upToExcluding: [termination], throwsIfOver: maximumBufferSize)
+        #else /// The above crashes the Swift 6.1.3 compiler. Make sure to inline it manually:
+        let termination = [termination]
+        var result = [Element]()
+        
+        while let next = await _nextIsolated() {
+            if result.count == maximumBufferSize {
+                throw AsyncSequenceReaderError.terminationNotFound(maximum: maximumBufferSize, actual: result.count + 1)
+            }
+            
+            result.append(next)
+            
+            if result.suffix(termination.count).elementsEqual(termination) {
+                return result.dropLast(termination.count)
+            }
+        }
+        
+        guard !result.isEmpty else { return nil }
+        
+        throw AsyncSequenceReaderError.terminationNotFound(maximum: maximumBufferSize, actual: result.count)
+        #endif
     }
     
     /// Collect elements into a sequence until the termination sequence is encountered, and return them as an array, excluding the termination sequence.
@@ -302,16 +351,36 @@ extension AsyncIteratorProtocol where Failure == Never {
     /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
+    @inlinable
     public mutating func collect(
         upToExcluding termination: some Collection<Element>,
         throwsIfOver maximumBufferSize: Int
-    ) async throws(AsyncSequenceReaderError) -> [Element]? where Element: Equatable {
+    ) async throws(AsyncSequenceReaderError) -> [Element]? {
+        #if compiler(<6.1.3) || compiler(>=6.2)
         try await collect(upToIncluding: termination, throwsIfOver: maximumBufferSize)?.dropLast(termination.count)
+        #else /// The above crashes the Swift 6.1.3 compiler. Make sure to inline it manually:
+        var result = [Element]()
+
+        while let next = await _nextIsolated() {
+            if result.count == maximumBufferSize {
+                throw AsyncSequenceReaderError.terminationNotFound(maximum: maximumBufferSize, actual: result.count + 1)
+            }
+            
+            result.append(next)
+            
+            if result.suffix(termination.count).elementsEqual(termination) {
+                return result.dropLast(termination.count)
+            }
+        }
+
+        guard !result.isEmpty else { return nil }
+
+        throw AsyncSequenceReaderError.terminationNotFound(maximum: maximumBufferSize, actual: result.count)
+        #endif
     }
 }
 
-extension AsyncIteratorProtocol {
-    
+extension AsyncIteratorProtocol where Element: Equatable {
     /// Collect elements into a sequence until the termination sequence is encountered, and transform it using the provided closure.
     ///
     /// - Note: It is up to the caller to verify if the termination sequence was encountered or not, which can easily be done by checking `result.suffix(termination.count).elementsEqual(termination)`.
@@ -344,13 +413,14 @@ extension AsyncIteratorProtocol {
     /// - Parameter termination: The element marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
+    @inlinable
     public mutating func collect<
         Transformed,
         TransformFailure: Error
     >(
         upToIncluding termination: Element,
         sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws(TransformFailure) -> Transformed
-    ) async throws(TransformFailure) -> Transformed? where Element: Equatable {
+    ) async throws(TransformFailure) -> Transformed? {
         try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
     }
     
@@ -386,6 +456,7 @@ extension AsyncIteratorProtocol {
     /// - Parameter termination: The sequence of elements marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
+    @inlinable
     public mutating func collect<
         TerminationCollection: Collection<Element>,
         Transformed,
@@ -393,7 +464,7 @@ extension AsyncIteratorProtocol {
     >(
         upToIncluding termination: TerminationCollection,
         sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, TerminationCollection>) async throws(TransformFailure) -> Transformed
-    ) async throws(TransformFailure) -> Transformed? where Element: Equatable {
+    ) async throws(TransformFailure) -> Transformed? {
         try await transform(with: sequenceTransform) { .init($0, termination: termination) }
     }
 }
@@ -431,6 +502,7 @@ extension AsyncBufferedIterator where Element: Equatable {
     /// - Parameter termination: The element marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
+    @inlinable
     public mutating func collect<Transformed>(
         upToIncluding termination: Element,
         sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws -> Transformed
@@ -470,6 +542,7 @@ extension AsyncBufferedIterator where Element: Equatable {
     /// - Parameter termination: The sequence of elements marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
+    @inlinable
     public mutating func collect<
         TerminationCollection: Collection<Element>,
         Transformed
