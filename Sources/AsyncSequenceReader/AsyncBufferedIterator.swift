@@ -76,3 +76,9 @@ public struct AsyncBufferedIterator<BaseIterator: AsyncIteratorProtocol>: AsyncI
 }
 
 extension AsyncBufferedIterator: Sendable where BaseIterator.Element: Sendable {}
+
+extension AsyncSequence {
+    public func makeBufferedIterator() -> AsyncBufferedIterator<AsyncIterator> {
+        AsyncBufferedIterator(makeAsyncIterator())
+    }
+}

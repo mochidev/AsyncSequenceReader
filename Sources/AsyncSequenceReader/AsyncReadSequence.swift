@@ -39,7 +39,7 @@ extension AsyncIteratorProtocol {
             results = try await sequenceTransform(readSequence)
             wrappedIterator = readSequence.baseIterator
         }
-        precondition(wrappedIterator.unconsumedBuffer.isEmpty, "A transform was requested, but the sequence was left in a state where the next value will never be read (fix: Use AnyReadableSequence(iterator) instead of calling `.transform` on `iterator` directly)")
+        precondition(wrappedIterator.unconsumedBuffer.isEmpty, "A transform was requested, but the sequence was left in a state where the next value will never be read (fix: Use `sequence.makeBufferedIterator()` instead of calling `.transform` on `iterator` directly)")
         self = wrappedIterator.baseIterator
         
         return results

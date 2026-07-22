@@ -48,6 +48,37 @@ import Testing
         #expect(await bufferedIterator.next() == nil)
     }
     
+    @Test func bufferIteratorFromStreamConstructor() async throws {
+        let testStream = AsyncStream<Int> { continuation in
+            for value in 0..<10 {
+                continuation.yield(value)
+            }
+            continuation.finish()
+        }
+        
+        var iterator = testStream.makeBufferedIterator()
+        
+        #expect(await iterator.next() == 0)
+        #expect(await iterator.next() == 1)
+        #expect(await iterator.next() == 2)
+        #expect(await iterator.next() == 3)
+        #expect(await iterator.next() == 4)
+        #expect(await iterator.hasMoreData() == true)
+        #expect(await iterator.hasMoreData() == true)
+        #expect(await iterator.hasMoreData() == true)
+        #expect(await iterator.next() == 5)
+        #expect(try await iterator.nonIsolatedNext() == 6)
+        #expect(await iterator.next() == 7)
+        #expect(await iterator.next() == 8)
+        #expect(await iterator.hasMoreData() == true)
+        #expect(await iterator.next() == 9)
+        #expect(await iterator.hasMoreData() == false)
+        #expect(await iterator.next() == nil)
+        #expect(await iterator.hasMoreData() == false)
+        #expect(await iterator.hasMoreData() == false)
+        #expect(await iterator.next() == nil)
+    }
+    
     @Test func bufferIteratorFromTestSequence() async throws {
         let testStream = TestSequence(base: 0..<10)
         

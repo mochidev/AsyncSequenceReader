@@ -294,7 +294,7 @@ import Testing
             })
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadSequence.swift:42: Precondition failed: A transform was requested, but the sequence was left in a state where the next value will never be read (fix: Use AnyReadableSequence(iterator) instead of calling `.transform` on `iterator` directly)")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadSequence.swift:42: Precondition failed: A transform was requested, but the sequence was left in a state where the next value will never be read (fix: Use `sequence.makeBufferedIterator()` instead of calling `.transform` on `iterator` directly)")
         #endif
     }
     
@@ -313,7 +313,7 @@ import Testing
             })
         }
         #if DEBUG
-        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadSequence.swift:42: Precondition failed: A transform was requested, but the sequence was left in a state where the next value will never be read (fix: Use AnyReadableSequence(iterator) instead of calling `.transform` on `iterator` directly)")
+        #expect(result?.standardErrorUTF8Lines.first == "AsyncSequenceReader/AsyncReadSequence.swift:42: Precondition failed: A transform was requested, but the sequence was left in a state where the next value will never be read (fix: Use `sequence.makeBufferedIterator()` instead of calling `.transform` on `iterator` directly)")
         #endif
     }
 }
