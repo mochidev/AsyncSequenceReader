@@ -11,11 +11,16 @@ extension AsyncIteratorProtocol {
     /// Asynchronously advances by the specified number of elements, or ends the sequence if there is no next element.
     ///
     /// If a complete array could not be collected, an error is thrown and the sequence should be considered finished.
+    ///
+    /// - Parameter actor: The isolation context to run the reciever on. 
     /// - Parameter count: The number of elements to collect.
     /// - Returns: A collection with exactly `count` elements, or `nil` if the sequence is finished.
     /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
-    public mutating func collect(_ count: Int) async throws -> [Element]? {
+    public mutating func collect(
+        isolation actor: isolated (any Actor)? = #isolation,
+        _ count: Int
+    ) async throws -> [Element]? {
         assert(count >= 0, "count must be larger than or equal to 0")
         return try await collect(min: count, max: count)
     }
@@ -23,12 +28,18 @@ extension AsyncIteratorProtocol {
     /// Asynchronously advances by the specified minimum number of elements, continuing until the specified maximum number of elements, or ends the sequence if there is no next element.
     ///
     /// If a complete array larger than `minCount` could not be constructed, an error is thrown and the sequence should be considered finished.
+    ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter minCount: The minimum number of elements to collect.
     /// - Parameter maxCount: The maximum number of elements to collect.
     /// - Returns: A collection with at least `minCount` and at most `maxCount` elements, or `nil` if the sequence is finished.
     /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
-    public mutating func collect(min minCount: Int = 0, max maxCount: Int) async throws -> [Element]? {
+    public mutating func collect(
+        isolation actor: isolated (any Actor)? = #isolation,
+        min minCount: Int = 0,
+        max maxCount: Int
+    ) async throws -> [Element]? {
         precondition(minCount <= maxCount, "maxCount must be larger than or equal to minCount")
         precondition(minCount >= 0, "minCount must be larger than or equal to 0")
         if maxCount == 0 { return [] }
@@ -59,11 +70,16 @@ extension AsyncIteratorProtocol where Failure == Never {
     /// Asynchronously advances by the specified number of elements, or ends the sequence if there is no next element.
     ///
     /// If a complete array could not be collected, an error is thrown and the sequence should be considered finished.
+    ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter count: The number of elements to collect.
     /// - Returns: A collection with exactly `count` elements, or `nil` if the sequence is finished.
     /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
-    public mutating func collect(_ count: Int) async throws(AsyncSequenceReaderError) -> [Element]? {
+    public mutating func collect(
+        isolation actor: isolated (any Actor)? = #isolation,
+        _ count: Int
+    ) async throws(AsyncSequenceReaderError) -> [Element]? {
         assert(count >= 0, "count must be larger than or equal to 0")
         #if compiler(<6.1.3) || compiler(>=6.2)
         return try await collect(min: count, max: count)
@@ -94,12 +110,18 @@ extension AsyncIteratorProtocol where Failure == Never {
     /// Asynchronously advances by the specified minimum number of elements, continuing until the specified maximum number of elements, or ends the sequence if there is no next element.
     ///
     /// If a complete array larger than `minCount` could not be constructed, an error is thrown and the sequence should be considered finished.
+    ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter minCount: The minimum number of elements to collect.
     /// - Parameter maxCount: The maximum number of elements to collect.
     /// - Returns: A collection with at least `minCount` and at most `maxCount` elements, or `nil` if the sequence is finished.
     /// - Throws: ``AsyncSequenceReaderError/insufficientElements(minimum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
-    public mutating func collect(min minCount: Int = 0, max maxCount: Int) async throws(AsyncSequenceReaderError) -> [Element]? {
+    public mutating func collect(
+        isolation actor: isolated (any Actor)? = #isolation,
+        min minCount: Int = 0,
+        max maxCount: Int
+    ) async throws(AsyncSequenceReaderError) -> [Element]? {
         precondition(minCount <= maxCount, "maxCount must be larger than or equal to minCount")
         precondition(minCount >= 0, "minCount must be larger than or equal to 0")
         if maxCount == 0 { return [] }
@@ -153,6 +175,7 @@ extension AsyncIteratorProtocol {
     /// // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter count: The number of elements the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
@@ -162,6 +185,7 @@ extension AsyncIteratorProtocol {
         Transformed,
         TransformFailure
     >(
+        isolation actor: isolated (any Actor)? = #isolation,
         _ count: Int,
         sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self>) async throws(TransformFailure) -> Transformed
     ) async throws(TransformFailure) -> Transformed? {
@@ -198,6 +222,7 @@ extension AsyncIteratorProtocol {
     ///
     /// - Important: This variation reads ahead a single byte
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter minCount: The minimum number of elements the `sequenceTransform` closure will attempt have access to. If this number cannot be guaranteed, an error will be thrown.
     /// - Parameter maxCount: The maximum number of elements the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
@@ -208,6 +233,7 @@ extension AsyncIteratorProtocol {
         Transformed,
         TransformFailure
     >(
+        isolation actor: isolated (any Actor)? = #isolation,
         min minCount: Int = 1,
         max maxCount: Int,
         sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self>) async throws(TransformFailure) -> Transformed
@@ -247,6 +273,7 @@ extension AsyncBufferedIterator {
     /// // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye!"
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter count: The number of elements the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
@@ -256,6 +283,7 @@ extension AsyncBufferedIterator {
         Transformed,
         TransformFailure
     >(
+        isolation actor: isolated (any Actor)? = #isolation,
         _ count: Int,
         sequenceTransform: sending (sending AsyncReadUpToCountSequence<BaseIterator>) async throws(TransformFailure) -> Transformed
     ) async throws(TransformFailure) -> Transformed? {
@@ -290,6 +318,7 @@ extension AsyncBufferedIterator {
     /// // Prints: "Hello, World!", "My name is Dimitri.", "", "Bye?"
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter minCount: The minimum number of elements the `sequenceTransform` closure will attempt have access to. If this number cannot be guaranteed, an error will be thrown.
     /// - Parameter maxCount: The maximum number of elements the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence of the specified size that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
@@ -300,6 +329,7 @@ extension AsyncBufferedIterator {
         Transformed,
         TransformFailure: Error
     >(
+        isolation actor: isolated (any Actor)? = #isolation,
         min minCount: Int = 0,
         max maxCount: Int,
         sequenceTransform: sending (sending AsyncReadUpToCountSequence<BaseIterator>) async throws(TransformFailure) -> Transformed
