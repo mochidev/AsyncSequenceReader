@@ -155,7 +155,7 @@ public struct AsyncIteratorMapSequence<Base: AsyncSequence, Transformed, Transfo
     @usableFromInline
     init(
         _ base: Base,
-        transform: @escaping (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async throws(TransformFailure) -> Transformed
+        transform: sending @escaping (_ iterator: inout AsyncBufferedIterator<Base.AsyncIterator>) async throws(TransformFailure) -> Transformed
     ) {
         self.base = base
         self.transform = transform

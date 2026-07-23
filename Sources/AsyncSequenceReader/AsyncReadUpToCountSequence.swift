@@ -388,7 +388,16 @@ extension AsyncReadUpToCountSequence: AsyncSequence {
         ///
         /// This iterator checks if `numberOfElementsRead` has exceeded the max size for the sequence. If it has not, then it'll read until it does. If the next value read marks the end of the sequence, but the minimum size has not yet been reached, an error is thrown.
         @inlinable
-        public mutating func next() async throws -> Element? {
+        @_disfavoredOverload
+        public mutating func next() async rethrows -> Element? {
+            try await next()
+        }
+        
+        /// Produces the next element in the sequence.
+        ///
+        /// This iterator checks if `numberOfElementsRead` has exceeded the max size for the sequence. If it has not, then it'll read until it does. If the next value read marks the end of the sequence, but the minimum size has not yet been reached, an error is thrown.
+        @inlinable
+        public mutating func next(isolation actor: isolated (any Actor)? = #isolation) async throws -> Element? {
             guard numberOfElementsRead < readSequence.maxCount else { return nil }
             guard let next = try await readSequence.baseIterator.next() else {
                 
