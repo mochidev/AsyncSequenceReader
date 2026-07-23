@@ -437,7 +437,7 @@ extension AsyncIteratorProtocol where Element: Equatable {
     >(
         isolation actor: isolated (any Actor)? = #isolation,
         upToIncluding termination: Element,
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws(TransformFailure) -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws(TransformFailure) -> sending Transformed
     ) async throws(TransformFailure) -> Transformed? {
         try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
     }
@@ -483,7 +483,7 @@ extension AsyncIteratorProtocol where Element: Equatable {
     >(
         isolation actor: isolated (any Actor)? = #isolation,
         upToIncluding termination: TerminationCollection,
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, TerminationCollection>) async throws(TransformFailure) -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, TerminationCollection>) async throws(TransformFailure) -> sending Transformed
     ) async throws(TransformFailure) -> Transformed? {
         try await transform(with: sequenceTransform) { .init($0, termination: termination) }
     }
@@ -527,7 +527,7 @@ extension AsyncBufferedIterator where Element: Equatable {
     public mutating func collect<Transformed>(
         isolation actor: isolated (any Actor)? = #isolation,
         upToIncluding termination: Element,
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws -> sending Transformed
     ) async rethrows -> Transformed? {
         try await collect(upToIncluding: [termination], sequenceTransform: sequenceTransform)
     }
@@ -572,7 +572,7 @@ extension AsyncBufferedIterator where Element: Equatable {
     >(
         isolation actor: isolated (any Actor)? = #isolation,
         upToIncluding termination: TerminationCollection,
-        sequenceTransform: sending (AsyncReadUpToElementsSequence<BaseIterator, TerminationCollection>) async throws -> Transformed
+        sequenceTransform: sending (AsyncReadUpToElementsSequence<BaseIterator, TerminationCollection>) async throws -> sending Transformed
     ) async rethrows -> Transformed? {
         try await transform(with: sequenceTransform) { .init($0, termination: termination) }
     }

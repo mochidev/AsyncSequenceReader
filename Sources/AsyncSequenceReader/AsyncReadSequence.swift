@@ -31,7 +31,7 @@ extension AsyncIteratorProtocol {
         TransformFailure: Error
     >(
         isolation actor: isolated (any Actor)? = #isolation,
-        with sequenceTransform: sending (sending ReadSequence) async throws(TransformFailure) -> Transformed,
+        with sequenceTransform: sending (sending ReadSequence) async throws(TransformFailure) -> sending Transformed,
         readSequenceFactory: (inout AsyncBufferedIterator<Self>) -> ReadSequence
     ) async throws(TransformFailure) -> Transformed? where ReadSequence.BaseIterator == Self {
         var results: Transformed? = nil
@@ -62,7 +62,7 @@ extension AsyncBufferedIterator {
         TransformFailure: Error
     >(
         isolation actor: isolated (any Actor)? = #isolation,
-        with sequenceTransform: sending (sending ReadSequence) async throws(TransformFailure) -> Transformed,
+        with sequenceTransform: sending (sending ReadSequence) async throws(TransformFailure) -> sending Transformed,
         readSequenceFactory: (inout Self) -> ReadSequence
     ) async throws(TransformFailure) -> Transformed? where ReadSequence.BaseIterator == BaseIterator {
         var results: Transformed? = nil

@@ -146,7 +146,7 @@ import Testing
     
     // MARK: - Test Transforms
     
-    func countCharacters<ReadSequence: AsyncReadSequence>(_ sequence: sending ReadSequence) async throws -> Int? where ReadSequence.Element == String {
+    func countCharacters<ReadSequence: AsyncReadSequence>(_ sequence: sending ReadSequence) async throws -> sending Int? where ReadSequence.Element == String {
         try await sequence.map { $0.count }.reduce(into: 0) { partialResult, next in
             partialResult += next
         }
