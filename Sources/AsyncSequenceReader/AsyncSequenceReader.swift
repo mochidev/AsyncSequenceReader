@@ -51,10 +51,26 @@ extension AsyncSequenceReader: AsyncSequence {
         /// Produces the next element in the sequence.
         ///
         /// This iterator calls `read()` with its base iterator, and lets that closure produce an appropriate result.
+        #if swift(<6.2)
         @inlinable
         public mutating func next() async throws -> Element? {
             return try await readSequence.read(&readSequence.baseIterator)
         }
+        #else
+        @inlinable
+        @_disfavoredOverload
+        public mutating func next() async rethrows -> Element? {
+            try await next()
+        }
+        
+        /// Produces the next element in the sequence.
+        ///
+        /// This iterator calls `read()` with its base iterator, and lets that closure produce an appropriate result.
+        @inlinable
+        public mutating func next(isolation actor: isolated (any Actor)? = #isolation) async throws -> Element? {
+            return try await readSequence.read(&readSequence.baseIterator)
+        }
+        #endif
     }
     
     @inlinable
