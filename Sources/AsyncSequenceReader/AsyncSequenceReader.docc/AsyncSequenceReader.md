@@ -1,12 +1,12 @@
 # ``AsyncSequenceReader``
 
-``AsyncSequenceReader`` provides building blocks to easily consume Swift's ``/Swift/AsyncSequence``.
+``AsyncSequenceReader`` provides building blocks to easily consume Swift's ``/AsyncSequenceReader/_Concurrency/AsyncSequence``.
 
 ## What is ``AsyncSequenceReader``?
 
 ``AsyncSequenceReader`` is a collection of building blocks to make it easy to read information and transform `AsyncSequence` into data types your app understands.
 
-Although an ``/Swift/AsyncSequence`` can be consumed via a `for await` loop, that isn't often the easiest way of consuming that data:
+Although an ``/AsyncSequenceReader/_Concurrency/AsyncSequence`` can be consumed via a `for await` loop, that isn't often the easiest way of consuming that data:
 
 ```swift
 
@@ -56,7 +56,7 @@ Reading values is as easy as calling `let value = try await iterator.next()`. Th
 
 Note: Resist the urge to catch errors within an iterator map, as once a value is read, it will no longer be available.
 
-Returning an object will make it available to whoever is consuming the resulting sequence, preparing your closure to be called again for the next object. Do note that Your closure will not be called unless something consumes your `results` sequence, either via `for await`, or by using `.reduce` or other ``/Swift/AsyncSequence`` methods.
+Returning an object will make it available to whoever is consuming the resulting sequence, preparing your closure to be called again for the next object. Do note that Your closure will not be called unless something consumes your `results` sequence, either via `for await`, or by using `.reduce` or other ``/AsyncSequenceReader/_Concurrency/AsyncSequence`` methods.
 
 Note: Do not copy the iterator to other methods without marking it as `inout`, since as a value type, a copy will be made, and further reads may become out of sync.
 
