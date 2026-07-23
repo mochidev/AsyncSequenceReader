@@ -187,7 +187,7 @@ extension AsyncIteratorProtocol {
     >(
         isolation actor: isolated (any Actor)? = #isolation,
         _ count: Int,
-        sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self>) async throws(TransformFailure) -> Transformed
+        sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self>) async throws(TransformFailure) -> sending Transformed
     ) async throws(TransformFailure) -> Transformed? {
         assert(count >= 0, "count must be larger than or equal to 0")
         return try await collect(min: count, max: count, sequenceTransform: sequenceTransform)
@@ -236,7 +236,7 @@ extension AsyncIteratorProtocol {
         isolation actor: isolated (any Actor)? = #isolation,
         min minCount: Int = 1,
         max maxCount: Int,
-        sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self>) async throws(TransformFailure) -> Transformed
+        sequenceTransform: sending (sending AsyncReadUpToCountSequence<Self>) async throws(TransformFailure) -> sending Transformed
     ) async throws(TransformFailure) -> Transformed? {
         /// It is unsafe to read ahead in this case, so exit early if we know we won't need to read.
         if maxCount == 0 { return nil }
@@ -285,7 +285,7 @@ extension AsyncBufferedIterator {
     >(
         isolation actor: isolated (any Actor)? = #isolation,
         _ count: Int,
-        sequenceTransform: sending (sending AsyncReadUpToCountSequence<BaseIterator>) async throws(TransformFailure) -> Transformed
+        sequenceTransform: sending (sending AsyncReadUpToCountSequence<BaseIterator>) async throws(TransformFailure) -> sending Transformed
     ) async throws(TransformFailure) -> Transformed? {
         assert(count >= 0, "count must be larger than 0")
         return try await collect(min: count, max: count, sequenceTransform: sequenceTransform)
@@ -332,7 +332,7 @@ extension AsyncBufferedIterator {
         isolation actor: isolated (any Actor)? = #isolation,
         min minCount: Int = 0,
         max maxCount: Int,
-        sequenceTransform: sending (sending AsyncReadUpToCountSequence<BaseIterator>) async throws(TransformFailure) -> Transformed
+        sequenceTransform: sending (sending AsyncReadUpToCountSequence<BaseIterator>) async throws(TransformFailure) -> sending Transformed
     ) async throws(TransformFailure) -> Transformed? {
         try await transform(with: sequenceTransform) { .init($0, minCount: minCount, maxCount: maxCount) }
     }
