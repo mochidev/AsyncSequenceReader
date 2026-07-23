@@ -27,7 +27,10 @@ Please check the [releases](https://github.com/mochidev/AsyncSequenceReader/rele
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/mochidev/AsyncSequenceReader.git", .upToNextMinor(from: "0.4.1")),
+    .package(
+        url: "https://github.com/mochidev/AsyncSequenceReader.git",
+        .upToNextMinor(from: "0.5.0")
+    ),
 ],
 ...
 targets: [
