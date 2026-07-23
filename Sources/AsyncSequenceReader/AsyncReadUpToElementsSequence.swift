@@ -31,7 +31,7 @@ extension AsyncIteratorProtocol where Element: Equatable {
     /// ```
     ///
     /// - Parameter termination: The element marking the end of the sequence that will be collected.
-    /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
+    /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
@@ -65,7 +65,7 @@ extension AsyncIteratorProtocol where Element: Equatable {
     /// ```
     ///
     /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
-    /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
+    /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
@@ -116,7 +116,7 @@ extension AsyncIteratorProtocol where Element: Equatable {
     /// ```
     ///
     /// - Parameter termination: The element marking the end of the sequence that will be collected.
-    /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
+    /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
@@ -150,7 +150,7 @@ extension AsyncIteratorProtocol where Element: Equatable {
     /// ```
     ///
     /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
-    /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
+    /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
@@ -187,7 +187,7 @@ extension AsyncIteratorProtocol where Element: Equatable, Failure == Never {
     /// ```
     ///
     /// - Parameter termination: The element marking the end of the sequence that will be collected.
-    /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
+    /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
@@ -242,7 +242,7 @@ extension AsyncIteratorProtocol where Element: Equatable, Failure == Never {
     /// ```
     ///
     /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
-    /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
+    /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
@@ -293,7 +293,7 @@ extension AsyncIteratorProtocol where Element: Equatable, Failure == Never {
     /// ```
     ///
     /// - Parameter termination: The element marking the end of the sequence that will be collected.
-    /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
+    /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
@@ -348,7 +348,7 @@ extension AsyncIteratorProtocol where Element: Equatable, Failure == Never {
     /// ```
     ///
     /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
-    /// - Parameter throwsIfOver: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
+    /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
