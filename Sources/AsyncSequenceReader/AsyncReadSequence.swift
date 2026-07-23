@@ -9,7 +9,7 @@
 
 /// An ``/AsyncSequenceReader/_Concurrency/AsyncSequence`` subtype suitable for reading an existing iterator in place.
 ///
-/// Note that to conform to this protocol, your type must be a reference type. After iterating, you'll also likely want to copy the base iterator back into your starting iterator, as shown in ``/AsyncSequenceReader/_Concurrency/AsyncIteratorProtocol/transform(with:readSequenceFactory:)``.
+/// Note that to conform to this protocol, your type must be a reference type. After iterating, you'll also likely want to copy the base iterator back into your starting iterator, as shown in ``AsyncBufferedIterator/transform(isolation:with:readSequenceFactory:)``.
 public protocol AsyncReadSequence: AsyncSequence, AnyObject {
     associatedtype BaseIterator: AsyncIteratorProtocol where BaseIterator.Element == Element
     
@@ -22,6 +22,7 @@ extension AsyncIteratorProtocol {
     ///
     /// - Note: Iterating over the read sequence multiple times will result in undefined behavior.
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence that can be read from, or stopped prematurely by returning `nil`. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Parameter readSequenceFactory: A factory to create a suitable ``AsyncReadSequence`` that will determine the logical bounds of the transformation within the receiving iterator.
     /// - Returns: A transformed value read from the iterator, or `nil` if there were no values left to read.
@@ -29,6 +30,7 @@ extension AsyncIteratorProtocol {
         Transformed, ReadSequence: AsyncReadSequence,
         TransformFailure: Error
     >(
+        isolation actor: isolated (any Actor)? = #isolation,
         with sequenceTransform: sending (sending ReadSequence) async throws(TransformFailure) -> Transformed,
         readSequenceFactory: (inout AsyncBufferedIterator<Self>) -> ReadSequence
     ) async throws(TransformFailure) -> Transformed? where ReadSequence.BaseIterator == Self {
@@ -50,7 +52,8 @@ extension AsyncBufferedIterator {
     /// Transform the receiving iterator using the specified sequence transformer and configured read sequence.
     ///
     /// - Note: Iterating over the read sequence multiple times will result in undefined behavior.
-    ///  
+    ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence that can be read from, or stopped prematurely by returning `nil`. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Parameter readSequenceFactory: A factory to create a suitable ``AsyncReadSequence`` that will determine the logical bounds of the transformation within the receiving iterator.
     /// - Returns: A transformed value read from the iterator, or `nil` if there were no values left to read.
@@ -58,6 +61,7 @@ extension AsyncBufferedIterator {
         Transformed, ReadSequence: AsyncReadSequence,
         TransformFailure: Error
     >(
+        isolation actor: isolated (any Actor)? = #isolation,
         with sequenceTransform: sending (sending ReadSequence) async throws(TransformFailure) -> Transformed,
         readSequenceFactory: (inout Self) -> ReadSequence
     ) async throws(TransformFailure) -> Transformed? where ReadSequence.BaseIterator == BaseIterator {

@@ -30,12 +30,14 @@ extension AsyncIteratorProtocol where Element: Equatable {
     /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter termination: The element marking the end of the sequence that will be collected.
     /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
     public mutating func collect(
+        isolation actor: isolated (any Actor)? = #isolation,
         upToIncluding termination: Element,
         throwsIfOver maximumBufferSize: Int
     ) async throws -> [Element]? {
@@ -64,12 +66,14 @@ extension AsyncIteratorProtocol where Element: Equatable {
     /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
     /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
     public mutating func collect(
+        isolation actor: isolated (any Actor)? = #isolation,
         upToIncluding termination: some Collection<Element>,
         throwsIfOver maximumBufferSize: Int
     ) async throws -> [Element]? {
@@ -115,12 +119,14 @@ extension AsyncIteratorProtocol where Element: Equatable {
     /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter termination: The element marking the end of the sequence that will be collected.
     /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
     public mutating func collect(
+        isolation actor: isolated (any Actor)? = #isolation,
         upToExcluding termination: Element,
         throwsIfOver maximumBufferSize: Int
     ) async throws -> [Element]? {
@@ -149,12 +155,14 @@ extension AsyncIteratorProtocol where Element: Equatable {
     /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
     /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
     public mutating func collect(
+        isolation actor: isolated (any Actor)? = #isolation,
         upToExcluding termination: some Collection<Element>,
         throwsIfOver maximumBufferSize: Int
     ) async throws -> [Element]? {
@@ -186,12 +194,14 @@ extension AsyncIteratorProtocol where Element: Equatable, Failure == Never {
     /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter termination: The element marking the end of the sequence that will be collected.
     /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
     public mutating func collect(
+        isolation actor: isolated (any Actor)? = #isolation,
         upToIncluding termination: Element,
         throwsIfOver maximumBufferSize: Int
     ) async throws(AsyncSequenceReaderError) -> [Element]? {
@@ -241,12 +251,14 @@ extension AsyncIteratorProtocol where Element: Equatable, Failure == Never {
     /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
     /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
     public mutating func collect(
+        isolation actor: isolated (any Actor)? = #isolation,
         upToIncluding termination: some Collection<Element>,
         throwsIfOver maximumBufferSize: Int
     ) async throws(AsyncSequenceReaderError) -> [Element]? {
@@ -292,12 +304,14 @@ extension AsyncIteratorProtocol where Element: Equatable, Failure == Never {
     /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter termination: The element marking the end of the sequence that will be collected.
     /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
     public mutating func collect(
+        isolation actor: isolated (any Actor)? = #isolation,
         upToExcluding termination: Element,
         throwsIfOver maximumBufferSize: Int
     ) async throws(AsyncSequenceReaderError) -> [Element]? {
@@ -347,12 +361,14 @@ extension AsyncIteratorProtocol where Element: Equatable, Failure == Never {
     /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter termination: The sequence of elements marking the end of the sequence that will be collected.
     /// - Parameter maximumBufferSize: The maximum amount of elements that will be read before an error is thrown if a termination is not detected.
     /// - Returns: An array of the collected elements, or `nil` if the sequence was already finished.
     /// - Throws: ``AsyncSequenceReaderError/terminationNotFound(maximum:actual:)`` if a complete byte sequence could not be returned by the time the sequence ended.
     @inlinable
     public mutating func collect(
+        isolation actor: isolated (any Actor)? = #isolation,
         upToExcluding termination: some Collection<Element>,
         throwsIfOver maximumBufferSize: Int
     ) async throws(AsyncSequenceReaderError) -> [Element]? {
@@ -410,6 +426,7 @@ extension AsyncIteratorProtocol where Element: Equatable {
     /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter termination: The element marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
@@ -418,6 +435,7 @@ extension AsyncIteratorProtocol where Element: Equatable {
         Transformed,
         TransformFailure: Error
     >(
+        isolation actor: isolated (any Actor)? = #isolation,
         upToIncluding termination: Element,
         sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws(TransformFailure) -> Transformed
     ) async throws(TransformFailure) -> Transformed? {
@@ -453,6 +471,7 @@ extension AsyncIteratorProtocol where Element: Equatable {
     /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter termination: The sequence of elements marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
@@ -462,6 +481,7 @@ extension AsyncIteratorProtocol where Element: Equatable {
         Transformed,
         TransformFailure: Error
     >(
+        isolation actor: isolated (any Actor)? = #isolation,
         upToIncluding termination: TerminationCollection,
         sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, TerminationCollection>) async throws(TransformFailure) -> Transformed
     ) async throws(TransformFailure) -> Transformed? {
@@ -499,11 +519,13 @@ extension AsyncBufferedIterator where Element: Equatable {
     /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter termination: The element marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
     @inlinable
     public mutating func collect<Transformed>(
+        isolation actor: isolated (any Actor)? = #isolation,
         upToIncluding termination: Element,
         sequenceTransform: sending (AsyncReadUpToElementsSequence<Self, Array<Element>>) async throws -> Transformed
     ) async rethrows -> Transformed? {
@@ -539,6 +561,7 @@ extension AsyncBufferedIterator where Element: Equatable {
     /// // Prints: "apple", "orange", "banana", "kiwi", "kumquat", "pear", "pineapple",
     /// ```
     ///
+    /// - Parameter actor: The isolation context to run the reciever on.
     /// - Parameter termination: The sequence of elements marking the end of the sequence the `sequenceTransform` closure will have access to.
     /// - Parameter sequenceTransform: A transformation that accepts a sequence containing elements up to the termination that can be read from, or stopped prematurely by returning early. The receiving iterator will have moved forward by the same amount of items consumed within `sequenceTransform`.
     /// - Returns: A transformed value as returned by `sequenceTransform`, or `nil` if the sequence was already finished.
@@ -547,6 +570,7 @@ extension AsyncBufferedIterator where Element: Equatable {
         TerminationCollection: Collection<Element>,
         Transformed
     >(
+        isolation actor: isolated (any Actor)? = #isolation,
         upToIncluding termination: TerminationCollection,
         sequenceTransform: sending (AsyncReadUpToElementsSequence<BaseIterator, TerminationCollection>) async throws -> Transformed
     ) async rethrows -> Transformed? {
